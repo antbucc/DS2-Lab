@@ -26,7 +26,7 @@ public class ApplicationMain {
         }
         
         ps.get(0).tell(new ReliableBroadcast.BroadcastMessage("a"), null);
-        try {
+      /*  try {
         	Thread.sleep(200);
         } catch (Exception e) {
         	e.printStackTrace();

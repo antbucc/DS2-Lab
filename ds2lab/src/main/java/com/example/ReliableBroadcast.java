@@ -318,7 +318,7 @@ public class ReliableBroadcast extends UntypedActor {
      */
 	private void Fdeliver(Object message, ActorRef me, ActorRef sender) throws Exception {
 		RBMessage m = (RBMessage) message;
-		//log.info("F delivered message \"{}\" from {}", m.getText(), sender.path().name());
+		log.info("F delivered message \"{}\" from {}", m.getText(), sender.path().name());
 		if (useCausalOrder) {
 			CausalOrder(message, me, sender);
 		}
@@ -483,7 +483,7 @@ public class ReliableBroadcast extends UntypedActor {
 	 * We want to simulate FIFO failure (with random delays)
 	 * to see the effect of the FIFO algorithm
 	 */
-	private boolean simulateFailureFIFO = true; 	
+	private boolean simulateFailureFIFO = false; 	
 	
 	/*
 	 * We want to reverse the receiving order of messages
@@ -496,7 +496,7 @@ public class ReliableBroadcast extends UntypedActor {
 	 * and we have 2 versions so isCausalBlocking
 	 * is for switching between them
 	 */
-	private boolean useCausalOrder = true;
+	private boolean useCausalOrder = false;
 	private boolean isCausalBlocking = false;
 	private Random rand = new Random(System.currentTimeMillis());
 	
