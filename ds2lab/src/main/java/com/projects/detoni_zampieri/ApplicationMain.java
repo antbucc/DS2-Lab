@@ -24,7 +24,7 @@ public class ApplicationMain{
         {
             a.tell(new NodeList(-1,nodes),null);
         }
-
+        
         // tell the nodes to start sending messages
         for(ActorRef a:nodes)
         {

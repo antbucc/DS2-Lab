@@ -65,11 +65,10 @@ class Node extends UntypedActor{
     private int messageId;
     private Random rnd;
 
-    public Node(ArrayList<ActorRef> peers)
+    public Node()
     {
         this.delivered = new HashSet<Message>();
-        this.peers = peers;
-        Random rnd = new Random();
+        this.rnd = new Random();
         this.messageId = rnd.nextInt();
     }
 
@@ -105,11 +104,11 @@ class Node extends UntypedActor{
 
     private void onStartBroadcast(StartBroadcast msg)
     {
-        this.messageId = rnd.nextInt();
+        this.messageId = this.rnd.nextInt();
         BroadcastMessage message = new BroadcastMessage(this.messageId);
         sendMessage(message);
         r_deliver(message);
-        this.delivered.add(msg);
+        this.delivered.add(message);
 
         // schedule another send of a new message in the future
         getContext().system().scheduler().scheduleOnce(
@@ -137,7 +136,7 @@ class Node extends UntypedActor{
     }
 
     public static Props props() {
-        return Props.create(Node.class);
+        return Props.create(Node.class,()->new Node());
     }
 
 }
