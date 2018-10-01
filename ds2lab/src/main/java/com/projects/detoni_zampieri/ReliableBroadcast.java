@@ -1,13 +1,15 @@
 package com.projects.detoni_zampieri;
 
 import akka.actor.ActorRef;
+import akka.actor.Props;
 import akka.actor.UntypedActor;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.io.Serializable;
-import java.lang.annotation.Inherited;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class ReliableBroadcast{
 
@@ -47,6 +49,15 @@ class StartBroadcast extends Message{
     }
 }
 
+class NodeList extends Message{
+    ArrayList<ActorRef> nodes;
+
+    public NodeList(int id,ArrayList<ActorRef> nodes) {
+        super(id);
+        this.nodes = nodes;
+    }
+}
+
 class Node extends UntypedActor{
 
     private HashSet<Message> delivered;
@@ -54,10 +65,10 @@ class Node extends UntypedActor{
     private int messageId;
     private Random rnd;
 
-    public Node()
+    public Node(ArrayList<ActorRef> peers)
     {
         this.delivered = new HashSet<Message>();
-        this.peers = new ArrayList<ActorRef>();
+        this.peers = peers;
         Random rnd = new Random();
         this.messageId = rnd.nextInt();
     }
@@ -71,8 +82,14 @@ class Node extends UntypedActor{
         {
             onBroadcastMessage((BroadcastMessage) message);
         }
+        else if(message instanceof NodeList)
+        {
+            onNodeList((NodeList) message);
+        }
         else unhandled(message);
     }
+
+    private void onNodeList(NodeList msg){ this.peers = msg.nodes; }
 
     private void sendMessage(Message msg){sendMessage(msg,null);}
 
@@ -94,6 +111,14 @@ class Node extends UntypedActor{
         r_deliver(message);
         this.delivered.add(msg);
 
+        // schedule another send of a new message in the future
+        getContext().system().scheduler().scheduleOnce(
+                new FiniteDuration(2000, TimeUnit.MILLISECONDS),
+                getSelf(),
+                new StartBroadcast(-1),
+                getContext().system().dispatcher(),
+                getSelf()
+        );
     }
 
     private void onBroadcastMessage(BroadcastMessage msg)
@@ -110,4 +135,9 @@ class Node extends UntypedActor{
     {
         System.out.println("Received message " + msg.id);
     }
+
+    public static Props props() {
+        return Props.create(Node.class);
+    }
+
 }
