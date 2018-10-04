@@ -4,7 +4,6 @@ package com.projects.detoni_zampieri.lab2;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import com.example.ReliableBroadcast;
 import com.projects.detoni_zampieri.lab2.actor.PullActor;
 import com.projects.detoni_zampieri.lab2.actor.PushActor;
 import com.projects.detoni_zampieri.lab2.actor.PushPullActor;
@@ -14,7 +13,7 @@ import java.util.List;
 
 public class ApplicationMain {
 
-    enum EpidemicUpdateType {PUSH, PULL, PUSHPULL};
+    enum EpidemicUpdateType {PUSH, PULL, PUSHPULL}
     static EpidemicUpdateType updateType = EpidemicUpdateType.PUSH;
 
     /*Return the correct instance of the actors*/
@@ -24,13 +23,13 @@ public class ApplicationMain {
         {
             case PUSH:
                 return PushActor.props().withDispatcher("akka.actor.my-pinned-dispatcher");
-            break;
             case PULL:
                 return PullActor.props().withDispatcher("akka.actor.my-pinned-dispatcher");
-            break;
             case PUSHPULL:
                 return PushPullActor.props().withDispatcher("akka.actor.my-pinned-dispatcher");
-            break;
+            default:
+                System.out.println("Unknown updateType!");
+                return null;
         }
     }
 
