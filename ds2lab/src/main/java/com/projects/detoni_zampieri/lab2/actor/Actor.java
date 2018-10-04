@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-class Actor extends UntypedActor {
+public class Actor extends UntypedActor {
 
     private HashSet<Message> delivered;
     private ArrayList<ActorRef> peers;
@@ -94,6 +94,34 @@ class Actor extends UntypedActor {
 
     public static Props props() {
         return Props.create(Actor.class,()->new Actor());
+    }
+
+    public class EpidemicValue {
+
+        private Timestamp timestamp;
+        private int value;
+
+        public EpidemicValue(Timestamp timestamp,int value) {
+            this.timestamp = timestamp;
+            this.value = value;
+        }
+
+        public Timestamp getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(Timestamp timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+
     }
 
 }
