@@ -24,7 +24,6 @@ public class ReliableBroadcast extends UntypedActor {
      */
     public static class StartMessage {
     	private final List<ActorRef> group;
-		
         public StartMessage(List<ActorRef> group) {
             this.group = Collections.unmodifiableList(group);
         }
@@ -34,12 +33,10 @@ public class ReliableBroadcast extends UntypedActor {
      * The BroadcastMessage from the main function will tell a process to broadcast to all peers
      */
     public static class BroadcastMessage {
-    	private final String text;
-    	
+    	private final String text;    	
     	public BroadcastMessage(String text) {
             this.text = text;
         }
-
         public String getText() {
             return text;
         }
