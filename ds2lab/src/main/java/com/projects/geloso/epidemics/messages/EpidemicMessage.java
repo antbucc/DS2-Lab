@@ -1,16 +1,17 @@
 package com.projects.geloso.epidemics.messages;
 
-import com.projects.geloso.epidemics.actors.EpidemicActor;
+import com.projects.geloso.epidemics.EpidemicValue;
 
-public class EpidemicMessage {
+public abstract class EpidemicMessage {
 
-    private EpidemicActor.EpidemicValue value = new EpidemicActor.EpidemicValue(0, null);
+    private final EpidemicValue value;
 
-    public EpidemicActor.EpidemicValue getValue() {
+    public EpidemicMessage(EpidemicValue value) {
+        this.value = value.clone();
+    }
+
+    public EpidemicValue getValue() {
         return value;
     }
 
-    public void setValue(EpidemicActor.EpidemicValue v) {
-        this.value.copy(v);
-    }
 }

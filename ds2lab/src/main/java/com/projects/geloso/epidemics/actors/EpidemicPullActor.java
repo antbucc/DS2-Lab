@@ -26,7 +26,4 @@ public class EpidemicPullActor extends EpidemicActor {
     protected void valueSyncedImpl() {
     }
 
-    public static class EpidemicPullMessage extends EpidemicMessage {
-
-    }
 }
