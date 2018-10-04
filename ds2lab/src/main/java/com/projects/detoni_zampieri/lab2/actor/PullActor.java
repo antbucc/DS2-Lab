@@ -12,17 +12,28 @@ public class PullActor extends Actor {
 		else if (message instanceof PullReplyMessage) {
 			onPullReplyMessage((PullReplyMessage)message);
 		}
+		else if(message instanceof TimeoutMessage) {
+			onTimeoutMessage((TimeoutMessage)message);
+		}
 		else unhandled(message);
 	}
 
+	private void onTimeoutMessage(TimeoutMessage message) {
+		PullRequestMessage req = new PullRequestMessage(this.value.getTimestamp());
+		this.sendMessage(req);
+	}
+
 	private void onPullReplyMessage(PullReplyMessage message) {
-		// TODO Auto-generated method stub
-		
+		if(this.value.getTimestamp().before(message.value.getTimestamp())) {
+			this.value = message.value;
+		}
 	}
 
 	private void onPullRequestMessage(PullRequestMessage message) {
-		// TODO Auto-generated method stub
-		
+		if(this.value.getTimestamp().after(message.timestamp)) {
+			PullReplyMessage rep = new PullReplyMessage(this.value);
+			getSender().tell(rep, getSender());
+		}
 	}
 	
 }
