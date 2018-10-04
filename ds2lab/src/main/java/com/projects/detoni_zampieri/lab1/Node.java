@@ -1,12 +1,12 @@
-package com.projects.detoni_zampieri;
+package com.projects.detoni_zampieri.lab1;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
-import com.projects.detoni_zampieri.message.BroadcastMessage;
-import com.projects.detoni_zampieri.message.Message;
-import com.projects.detoni_zampieri.message.NodeListMessage;
-import com.projects.detoni_zampieri.message.StartBroadcastMessage;
+import com.projects.detoni_zampieri.lab1.message.BroadcastMessage;
+import com.projects.detoni_zampieri.lab1.message.Message;
+import com.projects.detoni_zampieri.lab1.message.NodeListMessage;
+import com.projects.detoni_zampieri.lab1.message.StartBroadcastMessage;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.ArrayList;

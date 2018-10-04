@@ -1,4 +1,4 @@
-package com.projects.detoni_zampieri.message;
+package com.projects.detoni_zampieri.lab1.message;
 
 import java.io.Serializable;
 

@@ -1,10 +1,10 @@
-package com.projects.detoni_zampieri;
+package com.projects.detoni_zampieri.lab1;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import com.projects.detoni_zampieri.message.NodeListMessage;
-import com.projects.detoni_zampieri.message.StartBroadcastMessage;
+import com.projects.detoni_zampieri.lab1.message.NodeListMessage;
+import com.projects.detoni_zampieri.lab1.message.StartBroadcastMessage;
 
 import java.util.ArrayList;
 
