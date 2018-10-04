@@ -3,6 +3,7 @@ package com.projects.geloso.epidemics;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import com.example.ReliableBroadcast;
+import com.projects.geloso.epidemics.actors.EpidemicActor;
 
 import java.util.ArrayList;
 import java.util.List;

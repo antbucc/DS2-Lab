@@ -1,4 +1,4 @@
-package com.projects.geloso.epidemics;
+package com.projects.geloso.epidemics.actors;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
