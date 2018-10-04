@@ -12,7 +12,7 @@ import akka.actor.ActorSystem;
 
 public class ApplicationMain {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
     	
     	ActorSystem system = ActorSystem.create("MyActorSystem");
         
@@ -51,7 +51,7 @@ public class ApplicationMain {
         //pingActor.tell(new PingActor.Initialize(), null);
         // This example app will ping pong 3 times and thereafter terminate the ActorSystem -
         // see counter logic in PingActor
-        system.awaitTermination();
+        system.whenTerminated().wait();
     }
 
 } 
