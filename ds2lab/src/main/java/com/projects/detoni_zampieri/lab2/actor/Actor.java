@@ -7,6 +7,7 @@ import com.projects.detoni_zampieri.lab1.message.BroadcastMessage;
 import com.projects.detoni_zampieri.lab1.message.Message;
 import com.projects.detoni_zampieri.lab1.message.NodeListMessage;
 import com.projects.detoni_zampieri.lab1.message.StartBroadcastMessage;
+import com.projects.detoni_zampieri.lab2.message.EpidemicValue;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.sql.Timestamp;
@@ -76,34 +77,6 @@ public class Actor extends UntypedActor {
 
     public static Props props() {
         return Props.create(Actor.class,()->new Actor());
-    }
-
-    public class EpidemicValue {
-
-        private Timestamp timestamp;
-        private int value;
-
-        public EpidemicValue(Timestamp timestamp,int value) {
-            this.timestamp = timestamp;
-            this.value = value;
-        }
-
-        public Timestamp getTimestamp() {
-            return timestamp;
-        }
-
-        public void setTimestamp(Timestamp timestamp) {
-            this.timestamp = timestamp;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public void setValue(int value) {
-            this.value = value;
-        }
-
     }
 
 }

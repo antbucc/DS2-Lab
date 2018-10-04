@@ -2,7 +2,7 @@ package com.projects.detoni_zampieri.lab2.message;
 
 import java.sql.Timestamp;
 
-class EpidemicValue {
+public class EpidemicValue {
 
 	private Timestamp timestamp;
 	private int value;
