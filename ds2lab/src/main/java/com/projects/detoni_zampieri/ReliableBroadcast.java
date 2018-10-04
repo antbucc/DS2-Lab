@@ -107,6 +107,7 @@ class Node extends UntypedActor{
         this.messageId = this.rnd.nextInt();
         BroadcastMessage message = new BroadcastMessage(this.messageId);
         sendMessage(message);
+        System.out.println("Sending "+this.messageId);
         r_deliver(message);
         this.delivered.add(message);
 
