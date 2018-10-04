@@ -1,6 +1,7 @@
 package com.projects.geloso.epidemics.actors;
 
 import akka.actor.Props;
+import com.projects.geloso.epidemics.messages.EpidemicMessage;
 
 public class EpidemicPullActor extends EpidemicActor {
 

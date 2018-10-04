@@ -5,9 +5,11 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import com.projects.geloso.epidemics.messages.AssignMessage;
+import com.projects.geloso.epidemics.messages.EpidemicMessage;
+import com.projects.geloso.epidemics.messages.StartMessage;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -121,33 +123,6 @@ public abstract class EpidemicActor extends AbstractActor {
     protected void onEpidemicReceiveImpl(EpidemicMessage message) {
     }
 
-    /**
-     * The StartMessage from the main function will tell a process about the peers
-     */
-    public static class StartMessage {
-        private final List<ActorRef> group;
-
-        public StartMessage(List<ActorRef> group) {
-            this.group = Collections.unmodifiableList(group);
-        }
-    }
-
-    /**
-     * The AssignMessage from the main function will tell a process to update the value
-     */
-    public static class AssignMessage {
-        private final String text;
-
-        public AssignMessage(String text) {
-            super();
-            this.text = text;
-        }
-
-        public String getText() {
-            return text;
-        }
-    }
-
     public static class EpidemicValue {
         protected long timestamp = -1;
         protected String value = null;
@@ -184,15 +159,4 @@ public abstract class EpidemicActor extends AbstractActor {
         }
     }
 
-    public static class EpidemicMessage {
-        protected EpidemicValue value = new EpidemicValue(0, null);
-
-        public EpidemicValue getValue() {
-            return value;
-        }
-
-        public void setValue(EpidemicValue v) {
-            this.value.copy(v);
-        }
-    }
 }

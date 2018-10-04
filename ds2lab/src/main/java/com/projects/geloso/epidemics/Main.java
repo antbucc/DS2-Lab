@@ -3,8 +3,8 @@ package com.projects.geloso.epidemics;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import com.example.ReliableBroadcast;
-import com.projects.geloso.epidemics.actors.EpidemicActor;
 import com.projects.geloso.epidemics.actors.EpidemicPushActor;
+import com.projects.geloso.epidemics.messages.StartMessage;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -32,7 +32,7 @@ public class Main {
         }
 
         for (ActorRef p : group) {
-            p.tell(new EpidemicActor.StartMessage(group), null);
+            p.tell(new StartMessage(group), null);
         }
 
         group.get(0).tell(new ReliableBroadcast.BroadcastMessage("a"), null);
