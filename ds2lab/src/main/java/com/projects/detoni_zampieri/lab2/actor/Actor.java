@@ -17,50 +17,32 @@ import java.util.concurrent.TimeUnit;
 
 public class Actor extends UntypedActor {
 
-    private HashSet<Message> delivered;
     private ArrayList<ActorRef> peers;
-    private int messageId;
     private Random rnd;
+    protected EpidemicValue value;
 
     public Actor()
     {
-        this.delivered = new HashSet<Message>();
         this.rnd = new Random();
+        this.value = new EpidemicValue(new Timestamp(System.currentTimeMillis()), 1);
     }
 
-    public void onReceive(Object message) throws Exception {
-        if(message instanceof StartBroadcastMessage)
-        {
-            onStartBroadcast((StartBroadcastMessage) message);
-        }
-        else if (message instanceof BroadcastMessage)
-        {
-            onBroadcastMessage((BroadcastMessage) message);
-        }
-        else if(message instanceof NodeListMessage)
-        {
-            onNodeList((NodeListMessage) message);
-        }
-        else unhandled(message);
-    }
+    public void onReceive(Object message) throws Exception {};
 
     private void onNodeList(NodeListMessage msg){ this.peers = msg.nodes; }
 
-    private void sendMessage(Message msg){sendMessage(msg,null);}
+    private void sendMessage(Message msg){
 
-    private void sendMessage(Message msg,ActorRef avoid){
-        for(ActorRef a:this.peers)
-        {
-            if(a != avoid && a != getSelf())
-            {
-                a.tell(msg,getSelf());
-            }
-        }
+        int index=-1;
+        do {
+            index = rnd.nextInt(peers.size());
+        } while (this.peers.get(index).equals(this.getSelf()));
+
+        this.peers.get(index).tell(msg, this.getSelf());
     }
 
     private void onStartBroadcast(StartBroadcastMessage msg)
     {
-        this.messageId = this.rnd.nextInt();
         BroadcastMessage message = new BroadcastMessage(this.messageId);
         sendMessage(message);
         System.out.println("Sending "+this.messageId);
