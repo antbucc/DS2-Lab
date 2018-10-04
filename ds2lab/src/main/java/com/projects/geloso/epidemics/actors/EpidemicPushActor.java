@@ -17,15 +17,15 @@ public class EpidemicPushActor extends EpidemicActor {
 
     @Override
     protected void onEpidemicTimeoutImpl() {
-//        logger.debug("Timeout");
+        logger.debug("Timeout! Sending PUSH message with local value...");
         final ActorRef process = getRandomProcess();
         process.tell(new EpidemicPushMessage(getValue()), getSelf());
     }
 
     @Override
     protected void onEpidemicReceiveImpl(EpidemicMessage message) {
-        if (message.getValue().getTimestamp() > getValue().getTimestamp()) {
-            logger.debug("Received message with timestamp {}, updating local value", message.getValue().getTimestamp());
+        if (getValue().getTimestamp() < message.getValue().getTimestamp()) {
+            logger.debug("Received message with timestamp {}, updating local value...", message.getValue().getTimestamp());
             setValue(message.getValue().clone());
         }
     }

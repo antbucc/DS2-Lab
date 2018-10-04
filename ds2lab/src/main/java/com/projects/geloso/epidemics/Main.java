@@ -2,7 +2,9 @@ package com.projects.geloso.epidemics;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import com.projects.geloso.epidemics.actors.EpidemicPullActor;
 import com.projects.geloso.epidemics.actors.EpidemicPushActor;
+import com.projects.geloso.epidemics.actors.EpidemicPushPullActor;
 import com.projects.geloso.epidemics.messages.AssignMessage;
 import com.projects.geloso.epidemics.messages.StartMessage;
 import scala.concurrent.Await;
@@ -14,18 +16,28 @@ import java.util.concurrent.TimeoutException;
 
 public class Main {
 
-    private static EpiType epidemicType = EpiType.PUSH;
+    private static EpiType epidemicType = EpiType.PULL;
 
     public static void main(String[] args) throws InterruptedException, TimeoutException {
 
         ActorSystem system = ActorSystem.create("EpidemicSystem");
+        String dispatcherId = "akka.actor.my-pinned-dispatcher";
+        String actorName = "EPA%s";
 
-        int N = 4;
+        int actorNumbers = 4;
         List<ActorRef> group = new ArrayList<>();
-        for (int i = 1; i <= N; i++) {
+        for (int i = 1; i <= actorNumbers; i++) {
             switch (epidemicType) {
                 case PUSH: {
-                    group.add(system.actorOf(EpidemicPushActor.props().withDispatcher("akka.actor.my-pinned-dispatcher"), "EAP" + String.valueOf(i)));
+                    group.add(system.actorOf(EpidemicPushActor.props().withDispatcher(dispatcherId), String.format(actorName, String.valueOf(i))));
+                    break;
+                }
+                case PULL: {
+                    group.add(system.actorOf(EpidemicPullActor.props().withDispatcher(dispatcherId), String.format(actorName, String.valueOf(i))));
+                    break;
+                }
+                case PUSHPULL: {
+                    group.add(system.actorOf(EpidemicPushPullActor.props().withDispatcher(dispatcherId), String.format(actorName, String.valueOf(i))));
                     break;
                 }
             }
