@@ -47,7 +47,7 @@ public abstract class EpidemicActor extends AbstractActor {
     }
 
     private void startMessage(final StartMessage startMessage) {
-        processes = startMessage.group;
+        processes = startMessage.getGroup();
         setEpidemicTimeOut();
         runSchedule();
     }
