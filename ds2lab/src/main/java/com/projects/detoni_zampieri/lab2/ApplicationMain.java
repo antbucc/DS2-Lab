@@ -3,12 +3,36 @@ package com.projects.detoni_zampieri.lab2;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.Props;
 import com.example.ReliableBroadcast;
+import com.projects.detoni_zampieri.lab2.actor.PullActor;
+import com.projects.detoni_zampieri.lab2.actor.PushActor;
+import com.projects.detoni_zampieri.lab2.actor.PushPullActor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ApplicationMain {
+
+    enum EpidemicUpdateType {PUSH, PULL, PUSHPULL};
+    static EpidemicUpdateType updateType = EpidemicUpdateType.PUSH;
+
+    /*Return the correct instance of the actors*/
+    static public Props getProps()
+    {
+        switch (updateType)
+        {
+            case PUSH:
+                return PushActor.props().withDispatcher("akka.actor.my-pinned-dispatcher");
+            break;
+            case PULL:
+                return PullActor.props().withDispatcher("akka.actor.my-pinned-dispatcher");
+            break;
+            case PUSHPULL:
+                return PushPullActor.props().withDispatcher("akka.actor.my-pinned-dispatcher");
+            break;
+        }
+    }
 
     public static void main(String[] args) {
     	
@@ -17,13 +41,13 @@ public class ApplicationMain {
         int N = 4;
         List<ActorRef> ps = new ArrayList<ActorRef>();
         for (int i = 1; i <= N; i++) {
-        	ps.add(system.actorOf(ReliableBroadcast.props().withDispatcher("akka.actor.my-pinned-dispatcher"), "RB" + String.valueOf(i)));
+        	ps.add(system.actorOf(getProps(), "RB" + String.valueOf(i)));
         }
         for (ActorRef p : ps) {
-        	p.tell(new ReliableBroadcast.StartMessage(ps), null);
+        	//p.tell(new ReliableBroadcast.StartMessage(ps), null);
         }
         
-        ps.get(0).tell(new ReliableBroadcast.BroadcastMessage("a"), null);
+        //ps.get(0).tell(new ReliableBroadcast.BroadcastMessage("a"), null);
     }
 
 } 

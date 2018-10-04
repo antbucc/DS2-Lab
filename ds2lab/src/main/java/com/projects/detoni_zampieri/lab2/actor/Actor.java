@@ -9,23 +9,23 @@ import com.projects.detoni_zampieri.lab1.message.NodeListMessage;
 import com.projects.detoni_zampieri.lab1.message.StartBroadcastMessage;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-class Node extends UntypedActor {
+class Actor extends UntypedActor {
 
     private HashSet<Message> delivered;
     private ArrayList<ActorRef> peers;
     private int messageId;
     private Random rnd;
 
-    public Node()
+    public Actor()
     {
         this.delivered = new HashSet<Message>();
         this.rnd = new Random();
-        this.messageId = rnd.nextInt();
     }
 
     public void onReceive(Object message) throws Exception {
@@ -93,7 +93,7 @@ class Node extends UntypedActor {
     }
 
     public static Props props() {
-        return Props.create(Node.class,()->new Node());
+        return Props.create(Actor.class,()->new Actor());
     }
 
 }
