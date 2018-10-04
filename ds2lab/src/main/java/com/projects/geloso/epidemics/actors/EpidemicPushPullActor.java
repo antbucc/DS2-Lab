@@ -2,10 +2,15 @@ package com.projects.geloso.epidemics.actors;
 
 import akka.actor.Props;
 
-public class EpidemicPushActor extends EpidemicActor {
+public class EpidemicPushPullActor extends EpidemicActor {
 
     public static Props props() {
-        return Props.create(EpidemicPushActor.class);
+        return Props.create(EpidemicPushPullActor.class);
+    }
+
+    @Override
+    public Receive createReceive() {
+        return null;
     }
 
     @Override
@@ -20,7 +25,7 @@ public class EpidemicPushActor extends EpidemicActor {
     protected void valueSyncedImpl() {
     }
 
-    public static class EpidemicPushMessage extends EpidemicMessage {
-
+    public static class EpidemicPushPullMessage extends EpidemicMessage {
     }
 }
+

@@ -62,7 +62,7 @@ public abstract class EpidemicActor extends AbstractActor {
         return processes.get(rand.nextInt(processes.size()));
     }
 
-    protected EpidemicValue getValue() {
+    private EpidemicValue getValue() {
         synchronized (value) {
             return value;
         }
@@ -74,7 +74,8 @@ public abstract class EpidemicActor extends AbstractActor {
         }
     }
 
-    protected void setEpidemicTimeOut() {
+    private void setEpidemicTimeOut() {
+        long delta = 100;
         timeout = System.currentTimeMillis() + delta;
         //log.info("New timeout is {}", timeout);
     }
@@ -98,16 +99,16 @@ public abstract class EpidemicActor extends AbstractActor {
         t.start();
     }
 
-    protected void valueSynced() {
+    private void valueSynced() {
         log.info("Current value is \"{}\" at round {}", getValue().getValue(), round);
         valueSyncedImpl();
     }
 
-    protected void onEpidemicTimeout() {
+    private void onEpidemicTimeout() {
         onEpidemicTimeoutImpl();
     }
 
-    protected void onEpidemicReceive(EpidemicMessage message) {
+    private void onEpidemicReceive(EpidemicMessage message) {
         onEpidemicReceiveImpl(message);
     }
 
@@ -120,7 +121,7 @@ public abstract class EpidemicActor extends AbstractActor {
     protected void onEpidemicReceiveImpl(EpidemicMessage message) {
     }
 
-    /*
+    /**
      * The StartMessage from the main function will tell a process about the peers
      */
     public static class StartMessage {
@@ -131,7 +132,7 @@ public abstract class EpidemicActor extends AbstractActor {
         }
     }
 
-    /*
+    /**
      * The AssignMessage from the main function will tell a process to update the value
      */
     public static class AssignMessage {
@@ -142,7 +143,7 @@ public abstract class EpidemicActor extends AbstractActor {
             this.text = text;
         }
 
-        String getText() {
+        public String getText() {
             return text;
         }
     }
