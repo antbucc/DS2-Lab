@@ -7,6 +7,7 @@ import akka.actor.Props;
 import com.projects.detoni_zampieri.lab2.actor.PullActor;
 import com.projects.detoni_zampieri.lab2.actor.PushActor;
 import com.projects.detoni_zampieri.lab2.actor.PushPullActor;
+import com.projects.detoni_zampieri.lab2.message.ActorListMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,15 +39,17 @@ public class ApplicationMain {
     	ActorSystem system = ActorSystem.create("MyActorSystem");
         
         int N = 4;
-        List<ActorRef> ps = new ArrayList<ActorRef>();
+        ArrayList<ActorRef> ps = new ArrayList<ActorRef>();
+
+        // TODO: add the coordinator
         for (int i = 1; i <= N; i++) {
         	ps.add(system.actorOf(getProps(), "RB" + String.valueOf(i)));
         }
+
+        /* Send the entire list of peers to everybody*/
         for (ActorRef p : ps) {
-        	//p.tell(new ReliableBroadcast.StartMessage(ps), null);
+        	p.tell(new ActorListMessage(ps), null);
         }
-        
-        //ps.get(0).tell(new ReliableBroadcast.BroadcastMessage("a"), null);
     }
 
 } 
