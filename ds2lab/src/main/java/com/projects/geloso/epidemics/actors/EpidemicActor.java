@@ -15,9 +15,9 @@ public abstract class EpidemicActor extends AbstractActor {
 
     protected final ActorRef me = getSelf();
     private final long delta = 100;
-    protected List<ActorRef> processes = new ArrayList<ActorRef>();
-    int round = 0;
-    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private List<ActorRef> processes = new ArrayList<>();
+    private int round = 0;
     /*
      * Method to generate random delays
      */
@@ -29,31 +29,29 @@ public abstract class EpidemicActor extends AbstractActor {
         return Props.create(EpidemicActor.class);
     }
 
-    protected long randomDelay() {
-        return (long) (1000 + rand.nextInt(9000));
+    @Override
+    public Receive createReceive() {
+        return receiveBuilder()
+                .match(StartMessage.class, this::startMessage)
+                .match(AssignMessage.class, this::assignMessage)
+                .match(EpidemicMessage.class, this::onEpidemicReceive)
+                .build();
     }
 
-    public void onReceive(Object message) throws Exception {
-        if (message instanceof StartMessage) {
+    private void assignMessage(final AssignMessage assignMessage) {
+        getValue().setValue(assignMessage.getText());
+        getValue().setTimestamp(System.currentTimeMillis());
+        valueSynced();
+    }
 
-            /*
-             * Set the peer list
-             */
-            StartMessage sm = (StartMessage) message;
-            processes = sm.group;
-            setEpidemicTimeOut();
-            runSchedule();
-        } else if (message instanceof AssignMessage) {
-            AssignMessage am = (AssignMessage) message;
-            getValue().setValue(am.getText());
-            getValue().setTimestamp(System.currentTimeMillis());
-            valueSynced();
-        } else if (message instanceof EpidemicMessage) {
-            EpidemicMessage em = (EpidemicMessage) message;
-            onEpidemicReceive(em);
-        } else {
-            unhandled(message);
-        }
+    private void startMessage(final StartMessage startMessage) {
+        processes = startMessage.group;
+        setEpidemicTimeOut();
+        runSchedule();
+    }
+
+    protected long randomDelay() {
+        return (long) (1000 + rand.nextInt(9000));
     }
 
     protected ActorRef randomProcess() {

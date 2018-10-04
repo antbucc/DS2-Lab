@@ -10,11 +10,6 @@ public class EpidemicPushActor extends EpidemicActor {
     }
 
     @Override
-    public Receive createReceive() {
-        return null;
-    }
-
-    @Override
     protected void onEpidemicTimeoutImpl() {
     }
 
