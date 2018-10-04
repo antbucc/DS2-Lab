@@ -1,7 +1,10 @@
 package com.projects.detoni_zampieri.lab2.message;
 
+import akka.actor.ActorRef;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class Message implements Serializable {
 
@@ -42,5 +45,14 @@ class PushPullMessage implements Serializable{
 	public PushPullMessage(EpidemicValue value) {
 		this.value = value;
 	}
+}
+
+class ActorListMessage extends Message {
+
+	public ActorListMessage(ArrayList<ActorRef> nodes) {
+		this.nodes = nodes;
+	}
+
+	public ArrayList<ActorRef> nodes;
 }
 
