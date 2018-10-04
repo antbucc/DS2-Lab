@@ -3,7 +3,8 @@ package com.projects.detoni_zampieri;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import com.projects.detoni_zampieri.ReliableBroadcast.*;
+import com.projects.detoni_zampieri.message.NodeListMessage;
+import com.projects.detoni_zampieri.message.StartBroadcastMessage;
 
 import java.util.ArrayList;
 
@@ -22,13 +23,13 @@ public class ApplicationMain{
         // let the nodes know who is in the group
         for(ActorRef a:nodes)
         {
-            a.tell(new NodeList(-1,nodes),null);
+            a.tell(new NodeListMessage(-1,nodes),null);
         }
         
         // tell the nodes to start sending messages
         for(ActorRef a:nodes)
         {
-            a.tell(new StartBroadcast(-1),null);
+            a.tell(new StartBroadcastMessage(-1),null);
         }
     }
 }

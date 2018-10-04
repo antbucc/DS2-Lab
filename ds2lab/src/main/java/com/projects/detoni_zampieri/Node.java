@@ -3,62 +3,18 @@ package com.projects.detoni_zampieri;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
+import com.projects.detoni_zampieri.message.BroadcastMessage;
+import com.projects.detoni_zampieri.message.Message;
+import com.projects.detoni_zampieri.message.NodeListMessage;
+import com.projects.detoni_zampieri.message.StartBroadcastMessage;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-public class ReliableBroadcast{
-
-}
-
-class Message implements Serializable{
-    int id;
-    public Message(int id)
-    {
-        this.id = id;
-    }
-
-    public int hashCode()
-    {
-        return this.id;
-    }
-
-    public boolean equals(Object o)
-    {
-        if(o instanceof Message)
-        {
-            return ((Message)o).id == this.id;
-        }
-        else return false;
-    }
-}
-
-class BroadcastMessage extends Message{
-    public BroadcastMessage(int id) {
-        super(id);
-    }
-}
-
-class StartBroadcast extends Message{
-    public StartBroadcast(int id) {
-        super(id);
-    }
-}
-
-class NodeList extends Message{
-    ArrayList<ActorRef> nodes;
-
-    public NodeList(int id,ArrayList<ActorRef> nodes) {
-        super(id);
-        this.nodes = nodes;
-    }
-}
-
-class Node extends UntypedActor{
+class Node extends UntypedActor {
 
     private HashSet<Message> delivered;
     private ArrayList<ActorRef> peers;
@@ -73,22 +29,22 @@ class Node extends UntypedActor{
     }
 
     public void onReceive(Object message) throws Exception {
-        if(message instanceof StartBroadcast)
+        if(message instanceof StartBroadcastMessage)
         {
-            onStartBroadcast((StartBroadcast) message);
+            onStartBroadcast((StartBroadcastMessage) message);
         }
         else if (message instanceof BroadcastMessage)
         {
             onBroadcastMessage((BroadcastMessage) message);
         }
-        else if(message instanceof NodeList)
+        else if(message instanceof NodeListMessage)
         {
-            onNodeList((NodeList) message);
+            onNodeList((NodeListMessage) message);
         }
         else unhandled(message);
     }
 
-    private void onNodeList(NodeList msg){ this.peers = msg.nodes; }
+    private void onNodeList(NodeListMessage msg){ this.peers = msg.nodes; }
 
     private void sendMessage(Message msg){sendMessage(msg,null);}
 
@@ -102,7 +58,7 @@ class Node extends UntypedActor{
         }
     }
 
-    private void onStartBroadcast(StartBroadcast msg)
+    private void onStartBroadcast(StartBroadcastMessage msg)
     {
         this.messageId = this.rnd.nextInt();
         BroadcastMessage message = new BroadcastMessage(this.messageId);
@@ -114,7 +70,7 @@ class Node extends UntypedActor{
         getContext().system().scheduler().scheduleOnce(
                 new FiniteDuration(2000, TimeUnit.MILLISECONDS),
                 getSelf(),
-                new StartBroadcast(-1),
+                new StartBroadcastMessage(-1),
                 getContext().system().dispatcher(),
                 getSelf()
         );
