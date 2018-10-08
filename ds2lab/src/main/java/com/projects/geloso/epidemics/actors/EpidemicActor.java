@@ -16,16 +16,16 @@ import java.util.Random;
 
 public abstract class EpidemicActor extends AbstractActor {
 
-    protected final ActorRef me = getSelf();
+    private static final double UPDATE_PROBABILITY = 0.05;
     private final long delta = 100;
-    private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-    private List<ActorRef> processes = new ArrayList<>();
+    protected final ActorRef me = getSelf();
     private int round = 0;
-    /*
-     * Method to generate random delays
-     */
-    private Random rand = new Random(System.currentTimeMillis());
+    private List<ActorRef> processes = new ArrayList<>();
+    private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private EpidemicValue value = new EpidemicValue(0, null);
+
+    // Method to generate random delays
+    private Random rand = new Random(System.currentTimeMillis());
 
     @Override
     public Receive createReceive() {
@@ -70,6 +70,13 @@ public abstract class EpidemicActor extends AbstractActor {
         getContext().getSystem().getScheduler().schedule(
                 Duration.ofMillis(100),
                 Duration.ofMillis(100), () -> {
+                    if (rand.nextDouble() < UPDATE_PROBABILITY) {
+
+                        EpidemicValue current = getValue();
+                        EpidemicValue newVal = new EpidemicValue(current.getTimestamp() + 1, String.valueOf(rand.nextInt(100)));
+                        setValue(newVal);
+                        log.debug("UPDATED Value: {}", newVal);
+                    }
                     onEpidemicTimeoutImpl();
                     round++;
                 }, getContext().getSystem().getDispatcher());

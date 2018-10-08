@@ -22,4 +22,12 @@ public class EpidemicValue implements Cloneable {
     public EpidemicValue clone() {
         return new EpidemicValue(this.timestamp, this.value);
     }
+
+    @Override
+    public String toString() {
+        return "EpidemicValue{" +
+                "timestamp=" + timestamp +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }
