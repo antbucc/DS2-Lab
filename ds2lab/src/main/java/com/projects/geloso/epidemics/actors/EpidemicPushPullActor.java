@@ -36,8 +36,7 @@ public class EpidemicPushPullActor extends EpidemicActor {
                 if (myValueIsNewer) {
                     logger.debug("Received PUSH_PULL message with timestamp {}, sending local value...",
                             message.getValue().getTimestamp());
-                    EpidemicPullMessage reply = new EpidemicPullMessage(getValue());
-                    reply.setType(EpidemicPullMessage.PullType.REPLY);
+                    EpidemicPullMessage reply = new EpidemicPullMessage(getValue(), EpidemicPullMessage.PullType.REPLY);
                     getSender().tell(reply, getSelf());
                 } else if (itsValueIsNewer) {
                     logger.debug("Received PUSH_PULL message with timestamp {}, updating local value...",

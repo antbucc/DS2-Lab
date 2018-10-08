@@ -1,9 +1,13 @@
 /target/
 
 # Intellij config folder
-.idea/
+# Do not ignore .idea folder
+!.idea/
+# Ignore everything inside .idea folder
+.idea/*
+# Do not ignore shared run configurations
+!.idea/runConfigurations
 *.iml
-
 # Created by https://www.gitignore.io/api/java
 
 ### Java ###

@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="[geloso] epidemic pushpull " type="Application" factoryName="Application" singleton="true">
+    <envs>
+      <env name="EPIDEMIC_TYPE" value="PUSHPULL" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.projects.geloso.epidemics.Main" />
+    <module name="ds2lab" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.projects.geloso.epidemics.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
