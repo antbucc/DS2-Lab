@@ -21,7 +21,7 @@ import java.util.Scanner;
 public class ApplicationMain {
 
     enum EpidemicUpdateType {PUSH, PULL, PUSHPULL}
-    static EpidemicUpdateType updateType = EpidemicUpdateType.PUSH;
+    static EpidemicUpdateType updateType = EpidemicUpdateType.PULL;
 
     /*Return the correct instance of the actors*/
     static public Props getProps()

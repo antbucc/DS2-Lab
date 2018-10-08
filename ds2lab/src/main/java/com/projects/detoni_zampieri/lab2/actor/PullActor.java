@@ -2,6 +2,8 @@ package com.projects.detoni_zampieri.lab2.actor;
 
 import com.projects.detoni_zampieri.lab2.message.*;
 
+import akka.actor.Props;
+
 public class PullActor extends Actor {
 
 	@Override
@@ -38,7 +40,11 @@ public class PullActor extends Actor {
 
 	@Override
 	protected void onEpidemicTimeout() {
-
+		PullRequestMessage req = new PullRequestMessage(this.value.getTimestamp());
+		this.sendMessage(req);
 	}
 
+	public static Props props() {
+        return Props.create(PullActor.class,()->new PullActor());
+    }
 }
