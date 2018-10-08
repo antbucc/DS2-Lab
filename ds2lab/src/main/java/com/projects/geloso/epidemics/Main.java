@@ -16,18 +16,19 @@ import java.util.concurrent.TimeoutException;
 
 public class Main {
 
-    private static EpiType epidemicType = EpiType.PULL;
-
     public static void main(String[] args) throws InterruptedException, TimeoutException {
 
         ActorSystem system = ActorSystem.create("EpidemicSystem");
         String dispatcherId = "akka.actor.my-pinned-dispatcher";
         String actorName = "EPA%s";
 
+        final String epidemic_type = System.getenv("EPIDEMIC_TYPE");
+        final EpiType epiType = EpiType.valueOf(epidemic_type);
+
         int actorNumbers = 4;
         List<ActorRef> group = new ArrayList<>();
         for (int i = 1; i <= actorNumbers; i++) {
-            switch (epidemicType) {
+            switch (epiType) {
                 case PUSH: {
                     group.add(system.actorOf(EpidemicPushActor.props().withDispatcher(dispatcherId), String.format(actorName, String.valueOf(i))));
                     break;
