@@ -4,6 +4,7 @@ package com.projects.detoni_zampieri.lab2;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import akka.actor.PoisonPill;
 import com.projects.detoni_zampieri.lab2.actor.PullActor;
 import com.projects.detoni_zampieri.lab2.actor.PushActor;
 import com.projects.detoni_zampieri.lab2.actor.PushPullActor;
@@ -60,6 +61,10 @@ public class ApplicationMain {
 
             System.out.println(">>> Press ENTER to exit <<<");
             System.in.read();
+
+            for(ActorRef a:ps) {
+                a.tell(PoisonPill.getInstance(),null);
+            }
         }
         catch (IOException ioe) {}
         system.terminate();
