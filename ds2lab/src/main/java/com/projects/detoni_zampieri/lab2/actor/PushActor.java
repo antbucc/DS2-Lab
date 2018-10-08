@@ -9,13 +9,20 @@ public class PushActor extends Actor {
     }
 
     @Override
+    protected void onEpidemicTimeout() {
+        super.onEpidemicTimeout();
+        PushMessage msg = new PushMessage(this.value);
+        this.sendMessage(msg);
+    }
+
+    @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof PushMessage) {
             onPushMessage((PushMessage) message);
         } else if (message instanceof TimeoutMessage) {
             onTimeoutMessage((TimeoutMessage) message);
         } else {
-            unhandled(message);
+            super.onReceive(message);
         }
     }
 

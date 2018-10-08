@@ -41,7 +41,6 @@ public class ApplicationMain {
         int N = 4;
         ArrayList<ActorRef> ps = new ArrayList<ActorRef>();
 
-        // TODO: add the coordinator
         for (int i = 1; i <= N; i++) {
         	ps.add(system.actorOf(getProps(), "RB" + String.valueOf(i)));
         }
