@@ -5,7 +5,7 @@ import com.projects.detoni_zampieri.lab2.message.PushPullMessage;
 import com.projects.detoni_zampieri.lab2.message.TimeoutMessage;
 
 public class PushPullActor extends Actor {
-	
+
 	@Override
 	public void onReceive(Object message) throws Exception {
 		if(message instanceof PushPullMessage) {
@@ -37,5 +37,10 @@ public class PushPullActor extends Actor {
 	public void onTimeoutMessage(TimeoutMessage message) {
 		PushPullMessage msg = new PushPullMessage(this.value);
 		this.sendMessage(msg);
+	}
+
+	@Override
+	protected void onEpidemicTimeout() {
+
 	}
 }

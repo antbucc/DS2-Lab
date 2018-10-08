@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Actor extends UntypedActor {
+public abstract class Actor extends UntypedActor {
 
     private ArrayList<ActorRef> peers;
     private Random rnd;
@@ -90,10 +90,12 @@ public class Actor extends UntypedActor {
         timeout = System.currentTimeMillis() + delta;
     }
 
-    protected void onEpidemicTimeout() { System.out.println("Wrong method");}
+    protected abstract void onEpidemicTimeout();
+    //{ System.out.println("Wrong method");}
 
     public static Props props() {
-        return Props.create(Actor.class,()->new Actor());
+        //return Props.create(Actor.class,()->new Actor());
+        return null;
     }
 
     @Override

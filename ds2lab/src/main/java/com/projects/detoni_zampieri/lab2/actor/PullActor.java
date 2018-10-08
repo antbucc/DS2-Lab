@@ -3,7 +3,7 @@ package com.projects.detoni_zampieri.lab2.actor;
 import com.projects.detoni_zampieri.lab2.message.*;
 
 public class PullActor extends Actor {
-	
+
 	@Override
 	public void onReceive(Object message) throws Exception {
 		if(message instanceof PullRequestMessage) {
@@ -35,5 +35,10 @@ public class PullActor extends Actor {
 			getSender().tell(rep, getSender());
 		}
 	}
-	
+
+	@Override
+	protected void onEpidemicTimeout() {
+
+	}
+
 }
