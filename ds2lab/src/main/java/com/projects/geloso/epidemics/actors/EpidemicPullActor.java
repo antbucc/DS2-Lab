@@ -19,8 +19,7 @@ public class EpidemicPullActor extends EpidemicActor {
     protected void onEpidemicTimeoutImpl() {
 //        logger.debug("Timeout! Sending PULL message with local value...");
         final ActorRef process = getRandomProcess();
-        EpidemicPullMessage epm = new EpidemicPullMessage(getValue());
-        epm.setType(EpidemicPullMessage.PullType.PULL);
+        EpidemicPullMessage epm = new EpidemicPullMessage(getValue(), EpidemicPullMessage.PullType.PULL);
         process.tell(epm, getSelf());
     }
 
@@ -32,8 +31,7 @@ public class EpidemicPullActor extends EpidemicActor {
                 if (getValue().getTimestamp() > message.getValue().getTimestamp()) {
                     logger.debug("Received PULL message with timestamp {}, sending local value...",
                             message.getValue().getTimestamp());
-                    EpidemicPullMessage reply = new EpidemicPullMessage(getValue());
-                    reply.setType(EpidemicPullMessage.PullType.REPLY);
+                    EpidemicPullMessage reply = new EpidemicPullMessage(getValue(), EpidemicPullMessage.PullType.REPLY);
                     getSender().tell(reply, getSelf());
                 }
                 break;
