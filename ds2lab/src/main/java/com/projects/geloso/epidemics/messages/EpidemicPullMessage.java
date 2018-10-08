@@ -18,5 +18,5 @@ public class EpidemicPullMessage extends EpidemicMessage {
         this.type = type;
     }
 
-    public enum PullType {NONE, PULL, REPLY}
+    public enum PullType {NONE, PULL, REPLY, PUSH_PULL}
 }
