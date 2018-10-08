@@ -20,6 +20,7 @@ public class Actor extends UntypedActor {
     protected long timeout;
     protected long delta;
     protected int actorId;
+    protected boolean run;
 
     public Actor()
     {
@@ -28,6 +29,7 @@ public class Actor extends UntypedActor {
         this.round = 0;
         this.delta = 100;
         this.actorId = rnd.nextInt();
+        this.run = true;
     }
 
     public void onReceive(Object message) throws Exception {
@@ -56,7 +58,7 @@ public class Actor extends UntypedActor {
 
             public void run() {
                 // TODO Auto-generated method stub
-                while (true) {
+                while (run) {
                     if (System.currentTimeMillis() >= timeout) {
                         onEpidemicTimeout();
                         round++;
