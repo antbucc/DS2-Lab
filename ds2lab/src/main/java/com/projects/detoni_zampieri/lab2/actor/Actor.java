@@ -5,7 +5,9 @@ import akka.actor.Props;
 import akka.actor.UntypedActor;
 import com.projects.detoni_zampieri.lab2.message.ActorListMessage;
 import com.projects.detoni_zampieri.lab2.message.EpidemicValue;
+import com.projects.detoni_zampieri.lab2.message.GenerateUpdate;
 import com.projects.detoni_zampieri.lab2.message.Message;
+import com.projects.detoni_zampieri.lab2.message.KillMessage;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -36,12 +38,25 @@ public class Actor extends UntypedActor {
         if (message instanceof ActorListMessage)
         {
             onActorList((ActorListMessage) message);
+        } else if(message instanceof GenerateUpdate){
+            onGenerateUpdate((GenerateUpdate)message);
+        } else if(message instanceof KillMessage){
+        	onKillMessage((KillMessage)message);
         } else {
             unhandled(message);
         }
     }
 
-    protected void onActorList(ActorListMessage msg) { this.peers = msg.nodes; }
+    protected void onKillMessage(KillMessage message) { this.run = false; }
+    
+    protected void onGenerateUpdate(GenerateUpdate message) {
+        this.value = new EpidemicValue(new Timestamp(System.currentTimeMillis()),rnd.nextInt());
+    }
+
+    protected void onActorList(ActorListMessage msg) {
+    	this.peers = msg.nodes;
+    	runSchedule();
+    }
 
     protected void sendMessage(Message msg){
 
@@ -75,8 +90,7 @@ public class Actor extends UntypedActor {
         timeout = System.currentTimeMillis() + delta;
     }
 
-    protected void onEpidemicTimeout()
-    {}
+    protected void onEpidemicTimeout() { System.out.println("Wrong method");}
 
     public static Props props() {
         return Props.create(Actor.class,()->new Actor());

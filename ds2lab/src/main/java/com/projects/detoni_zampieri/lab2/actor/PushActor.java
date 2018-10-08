@@ -11,6 +11,7 @@ public class PushActor extends Actor {
     @Override
     protected void onEpidemicTimeout() {
         super.onEpidemicTimeout();
+        System.out.println("Actor "+this.actorId+" sending push");
         PushMessage msg = new PushMessage(this.value);
         this.sendMessage(msg);
     }

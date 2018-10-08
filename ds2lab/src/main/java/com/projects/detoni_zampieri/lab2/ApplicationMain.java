@@ -9,10 +9,14 @@ import com.projects.detoni_zampieri.lab2.actor.PullActor;
 import com.projects.detoni_zampieri.lab2.actor.PushActor;
 import com.projects.detoni_zampieri.lab2.actor.PushPullActor;
 import com.projects.detoni_zampieri.lab2.message.ActorListMessage;
+import com.projects.detoni_zampieri.lab2.message.GenerateUpdate;
+import com.projects.detoni_zampieri.lab2.message.KillMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
 
 public class ApplicationMain {
 
@@ -56,17 +60,23 @@ public class ApplicationMain {
         // Wait until we have no more messages and then press ENTER
         // to terminate the execution.
         try {
-            System.out.println(">>> Wait for the chats to stop and press ENTER <<<");
-            System.in.read();
+            System.out.println(">>> Press any key to generate an update <<<");
+            System.out.println(">>> Press \"q\" to stop <<<");
 
-            System.out.println(">>> Press ENTER to exit <<<");
-            System.in.read();
+            Random rnd = new Random();
+            Scanner scanner = new Scanner(System.in);
+
+            while(!scanner.nextLine().equals("q"))
+            {
+                System.out.println("\tSending a new update");
+                ps.get(rnd.nextInt(ps.size())).tell(new GenerateUpdate(),null);
+            }            
 
             for(ActorRef a:ps) {
-                a.tell(PoisonPill.getInstance(),null);
+                a.tell(new KillMessage(),null);
             }
         }
-        catch (IOException ioe) {}
+        catch (Exception e) {}
         system.terminate();
 
     }
