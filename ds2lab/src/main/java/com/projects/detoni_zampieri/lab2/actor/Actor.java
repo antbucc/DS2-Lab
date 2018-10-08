@@ -19,6 +19,7 @@ public class Actor extends UntypedActor {
     protected int round;
     protected long timeout;
     protected long delta;
+    protected int actorId;
 
     public Actor()
     {
@@ -26,6 +27,7 @@ public class Actor extends UntypedActor {
         this.value = new EpidemicValue(new Timestamp(System.currentTimeMillis()), 1);
         this.round = 0;
         this.delta = 100;
+        this.actorId = rnd.nextInt();
     }
 
     public void onReceive(Object message) throws Exception {
@@ -78,4 +80,9 @@ public class Actor extends UntypedActor {
         return Props.create(Actor.class,()->new Actor());
     }
 
+    @Override
+    public void postStop() throws Exception {
+        super.postStop();
+        System.out.println("Actor "+ String.valueOf(this.actorId)+", value: "+ String.valueOf(this.value));
+    }
 }

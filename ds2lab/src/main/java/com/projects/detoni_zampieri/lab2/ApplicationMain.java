@@ -9,6 +9,7 @@ import com.projects.detoni_zampieri.lab2.actor.PushActor;
 import com.projects.detoni_zampieri.lab2.actor.PushPullActor;
 import com.projects.detoni_zampieri.lab2.message.ActorListMessage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,20 @@ public class ApplicationMain {
         for (ActorRef p : ps) {
         	p.tell(new ActorListMessage(ps), null);
         }
+
+        // Smartly manage the lifetime of the application.
+        // Wait until we have no more messages and then press ENTER
+        // to terminate the execution.
+        try {
+            System.out.println(">>> Wait for the chats to stop and press ENTER <<<");
+            System.in.read();
+
+            System.out.println(">>> Press ENTER to exit <<<");
+            System.in.read();
+        }
+        catch (IOException ioe) {}
+        system.terminate();
+
     }
 
 } 
