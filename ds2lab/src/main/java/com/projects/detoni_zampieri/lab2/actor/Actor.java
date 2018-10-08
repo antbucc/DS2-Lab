@@ -85,6 +85,6 @@ public class Actor extends UntypedActor {
     @Override
     public void postStop() throws Exception {
         super.postStop();
-        System.out.println("Actor "+ String.valueOf(this.actorId)+", value: "+ String.valueOf(this.value));
+        System.out.println("Actor "+ String.valueOf(this.actorId)+", value: "+ String.valueOf(this.value.getValue()));
     }
 }
