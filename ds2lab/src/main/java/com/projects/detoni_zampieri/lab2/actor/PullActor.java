@@ -5,7 +5,7 @@ import com.projects.detoni_zampieri.lab2.message.*;
 public class PullActor extends Actor {
 	
 	@Override
-	public void onReceive(Object message) {
+	public void onReceive(Object message) throws Exception {
 		if(message instanceof PullRequestMessage) {
 			onPullRequestMessage((PullRequestMessage)message);
 		}
@@ -15,7 +15,7 @@ public class PullActor extends Actor {
 		else if(message instanceof TimeoutMessage) {
 			onTimeoutMessage((TimeoutMessage)message);
 		}
-		else unhandled(message);
+		else super.onReceive(message);
 	}
 
 	private void onTimeoutMessage(TimeoutMessage message) {

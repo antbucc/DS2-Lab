@@ -7,7 +7,7 @@ import com.projects.detoni_zampieri.lab2.message.TimeoutMessage;
 public class PushPullActor extends Actor {
 	
 	@Override
-	public void onReceive(Object message) {
+	public void onReceive(Object message) throws Exception {
 		if(message instanceof PushPullMessage) {
 			onPushPullMessage((PushPullMessage)message);
 		}
@@ -17,7 +17,7 @@ public class PushPullActor extends Actor {
 		else if(message instanceof TimeoutMessage) {
 			onTimeoutMessage((TimeoutMessage)message);
 		}
-		else unhandled(message);
+		else super.onReceive(message);
 	}
 	
 	public void onPushPullMessage(PushPullMessage message) {
