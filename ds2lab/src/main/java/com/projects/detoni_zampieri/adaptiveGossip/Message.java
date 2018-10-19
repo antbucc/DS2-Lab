@@ -1,6 +1,8 @@
 package com.projects.detoni_zampieri.adaptiveGossip;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Message implements Serializable {
 
