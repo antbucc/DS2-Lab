@@ -4,9 +4,11 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
 
-    public Message() {
+    public Message(List<Event> events) {
         this.age = 0;
+        this.events = new ArrayList<>(events);
     }
 
-    private int age;
+    public int age;
+    public List<Event> events;
 }

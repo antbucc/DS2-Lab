@@ -27,13 +27,39 @@ public class GossipActor extends UntypedActor {
         if (o instanceof ListMessage)
         {
             this.peers = ((ListMessage) o).m_nodes;
-
-
-
+        } else if (o instanceof Message) {
+            onReceiveGossip((Message)o);
         } else
         {
             unhandled(o);
         }
+    }
+
+    public Event getLocalEvent(Event e)
+    {
+        return this.get(this.events.indexOf(e));
+    }
+
+    public void onReceiveGossip(Message gossip)
+    {
+        for(Event e:gossip.events)
+        {
+            if(!this.events.contains(e))
+            {
+                this.events.add(e);
+                deliver(e);
+            }
+            else {
+                Event e_prime = getLocalEvent(e);
+                if(e_prime.age < e.age)
+                    e_prime.age = e.age
+            }
+        }
+    }
+
+    public void deliver(Event e)
+    {
+        System.out.println("Received event "+e.id.toString());
     }
 
     // Default variables for the actor
