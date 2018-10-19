@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ApplicationMain {
 
-    static final int T = 2000; // Broadcast message in a gossip fashion every T seconds
-    static final int S = 3000;
+    static final int T = 1000; // Broadcast message in a gossip fashion every T seconds
+    static final int S = 2000;
 
     public static void main(String[] args) {
         final ActorSystem system = ActorSystem.create("adaptive-gossip");

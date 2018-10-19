@@ -142,6 +142,15 @@ public class GossipActor extends UntypedActor {
         System.out.println("Received event "+e.id.toString());
     }
 
+    @Override
+    public void postStop() throws Exception {
+        super.postStop();
+        System.out.println("Actor "+nodeId+"-> MinBuffer("
+                +minBuffer
+                +"), ActualMinBuffer("
+                +(this.MAX_BUFFER_SIZE-this.minBuffers.size())+")");
+    }
+
     // Default variables for the actor
     public Random rng;
     public int nodeId;
