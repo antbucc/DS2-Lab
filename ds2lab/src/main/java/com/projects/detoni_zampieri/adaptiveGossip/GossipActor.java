@@ -95,12 +95,13 @@ public class GossipActor extends UntypedActor {
         if(this.events.size() > this.MAX_BUFFER_SIZE)
         {
             //remove the excess
-            ArrayList<Event> sorted_events = this.events.clone();
+            ArrayList<Event> sorted_events = new ArrayList<>(this.events);
             Collections.sort(sorted_events,(e1,e2)-> e2.age - e1.age);
-            diff = this.events.size() - MAX_BUFFER_SIZE;
+            int diff = this.events.size() - MAX_BUFFER_SIZE;
             Iterator<Event> iter = sorted_events.iterator();
-            for(int i=0;i<diff;i++,(Event e =iter.next()))
+            for(int i=0;i<diff;i++)
             {
+                iter.next();
                 iter.remove();
             }
             
