@@ -18,6 +18,14 @@ public class GossipActor extends UntypedActor {
         this.k = 10;
         this.f = 3;
 
+        this.delta = 2;
+        this.s = 2;
+        this.minBuffers = new ArrayList<Integer>();
+        for (int i=0; i<delta; i++)
+        {
+            this.minBuffers.add(i, MAX_BUFFER_SIZE - this.events.size());
+        }
+
     }
 
     @Override
@@ -42,7 +50,24 @@ public class GossipActor extends UntypedActor {
             this.events.add(((UpdateAgesAndGossipMessage)o).newEvent);
 
             // Send gossip to everybody
-            gossipMulticast(new Message(new ArrayList<>(this.events)));
+            gossipMulticast(new Message(new ArrayList<>(this.events),
+                    this.s,
+                    this.minBuffer));
+
+        }else if (o instanceof EnterNewPeriodMessage){
+
+            this.s++;
+            this.minBuffers.add(s-1, this.MAX_BUFFER_SIZE-this.events.size());
+            this.minBuffer = this.minBuffers.get(s-1);
+
+            for(int i=s-1; i>s-1-delta-1; i--)
+            {
+                if (this.minBuffers.get(i) < this.minBuffer)
+                {
+                    this.minBuffer = this.minBuffers.get(i);
+                }
+            }
+
 
         } else if (o instanceof Message) {
             onReceiveGossip((Message)o);
@@ -103,6 +128,13 @@ public class GossipActor extends UntypedActor {
             }
             
         }
+
+        // Update congestion rates
+        if (gossip.age == this.s && gossip.minBuffer < this.minBuffers.get(s-1))
+        {
+            this.minBuffers.set(s-1, gossip.minBuffer);
+        }
+
     }
 
     public void deliver(Event e)
@@ -119,7 +151,9 @@ public class GossipActor extends UntypedActor {
     private int MAX_BUFFER_SIZE = 100; // Max number of messages
     public List<Event> events; // Buffer for messages
     public int minBuffer; // Minimal size of the buffer
+    public List<Integer> minBuffers;
     public int s; // Current period
+    public int delta; // Interval for computing minBuffer
     public int k; // Maximum age for events
     public int f; // Total number of random peers (fanout)
 }
