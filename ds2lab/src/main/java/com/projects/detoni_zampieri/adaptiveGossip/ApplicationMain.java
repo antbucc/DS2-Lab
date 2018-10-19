@@ -1,12 +1,16 @@
 package com.projects.detoni_zampieri.adaptiveGossip;
 
+import akka.actor.Actor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ApplicationMain {
 
@@ -25,6 +29,17 @@ public class ApplicationMain {
         // Send the list of all actors.
         for (int i = 0; i < numActors; i++) {
             nodes.get(i).tell(new ListMessage(nodes), ActorRef.noSender());
+        }
+
+        // Schedule update of ages and gossiping
+        for (ActorRef peer : nodes)
+        {
+            system.scheduler().schedule(new FiniteDuration(0, TimeUnit.MILLISECONDS),
+                    new FiniteDuration(2000, TimeUnit.MILLISECONDS),
+                    peer,
+                    new UpdateAgesAndGossipMessage(),
+                    system.dispatcher(),
+                    null);
         }
 
         // Smartly manage the lifetime of the application.

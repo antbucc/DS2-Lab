@@ -2,10 +2,14 @@ package com.projects.detoni_zampieri.adaptiveGossip;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+import com.projects.detoni_zampieri.lab1.message.StartBroadcastMessage;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class GossipActor extends UntypedActor {
 
@@ -15,7 +19,7 @@ public class GossipActor extends UntypedActor {
         this.rng = new Random();
         this.nodeId = rng.nextInt();
 
-        this.events = new ArrayList<Message>();
+        this.events = new ArrayList<Event>();
         this.minBuffer = MAX_BUFFER_SIZE - this.events.size();
 
     }
@@ -27,12 +31,48 @@ public class GossipActor extends UntypedActor {
         if (o instanceof ListMessage)
         {
             this.peers = ((ListMessage) o).m_nodes;
+        } else if (o instanceof UpdateAgesAndGossipMessage)
+        {
+            // Increment age of events
+            for (Event e : events)
+            {
+                e.age++;
+            }
 
+            // Remove oldest elements
+            for (Event e : events)
+            {
+                if (e.age > k)
+                {
+                    events.remove(e);
+                }
+            }
 
-
-        } else
+            // Send gossip to everybody
+            
+        }
+        else
         {
             unhandled(o);
+        }
+    }
+
+    private void gossipMulticast(Message m)
+    {
+        // Select f random processes
+        // and send them the message
+        Collections.shuffle(this.peers);
+        int skip=0;
+        for (int i=0; i<f; i++)
+        {
+            // Do not send a message to myself (h@ck3r w@y)
+            if (this.peers.get(i).equals(getSelf()))
+            {
+                skip++;
+                i--;
+            } else {
+                this.peers.get(i + skip).tell(m, ActorRef.noSender());
+            }
         }
     }
 
@@ -43,7 +83,10 @@ public class GossipActor extends UntypedActor {
 
     // Adaptive Gossip Variables
     private int MAX_BUFFER_SIZE = 100; // Max number of messages
-    public List<Message> events; // Buffer for messages
+    public List<Event> events; // Buffer for messages
     public int minBuffer; // Minimal size of the buffer
     public int s; //Current period
+    public int T;
+    public int k; // Maximum age for events
+    public int f; // Total number of random peers
 }
