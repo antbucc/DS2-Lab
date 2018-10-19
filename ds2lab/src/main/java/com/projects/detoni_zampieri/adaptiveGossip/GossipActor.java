@@ -42,6 +42,7 @@ public class GossipActor extends UntypedActor {
 
     public void onReceiveGossip(Message gossip)
     {
+        //update my events
         for(Event e:gossip.events)
         {
             if(!this.events.contains(e))
@@ -53,6 +54,18 @@ public class GossipActor extends UntypedActor {
                 Event e_prime = getLocalEvent(e);
                 if(e_prime.age < e.age)
                     e_prime.age = e.age
+            }
+        }
+        if(this.events.size() > this.MAX_BUFFER_SIZE)
+        {
+            //remove the excess
+            ArrayList<Event> sorted_events = this.events.clone();
+            Collections.sort(sorted_events,(e1,e2)-> e2.age - e1.age);
+            diff = this.events.size() - MAX_BUFFER_SIZE;
+            Iterator<Event> iter = sorted_events.iterator();
+            for(int i=0;i<diff;i++,(Event e =iter.next()))
+            {
+                //TODO
             }
         }
     }
