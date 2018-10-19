@@ -1,13 +1,11 @@
 package com.projects.detoni_zampieri.adaptiveGossip;
 
-import akka.actor.Actor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;

@@ -2,11 +2,8 @@ package com.projects.detoni_zampieri.adaptiveGossip;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
-import com.projects.detoni_zampieri.lab1.message.StartBroadcastMessage;
-import scala.concurrent.duration.FiniteDuration;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class GossipActor extends UntypedActor {
 
