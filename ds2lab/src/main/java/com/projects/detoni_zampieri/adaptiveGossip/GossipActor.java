@@ -49,6 +49,7 @@ public class GossipActor extends UntypedActor {
             }
 
             // Send gossip to everybody
+            gossipMulticast(new Message(Collections.unmodifiableList(this.events)));
 
         } else if (o instanceof Message) {
             onReceiveGossip((Message)o);
