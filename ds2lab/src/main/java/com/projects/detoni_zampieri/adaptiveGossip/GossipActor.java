@@ -107,15 +107,7 @@ public class GossipActor extends UntypedActor {
             {
                 iter.remove();
             }
-
-
-
-            Iterator<Event> iter = list.iterator();
-            while(iter.hasNext())
-            {
-                Event e = iter.next();
-
-            }
+            
         }
     }
 
