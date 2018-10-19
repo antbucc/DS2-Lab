@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ApplicationMain {
 
+    static final int T = 2000; // Broadcast message in a gossip fashion every T seconds
+
     public static void main(String[] args) {
         final ActorSystem system = ActorSystem.create("adaptive-gossip");
         int numActors = 10;
@@ -35,7 +37,7 @@ public class ApplicationMain {
         for (ActorRef peer : nodes)
         {
             system.scheduler().schedule(new FiniteDuration(0, TimeUnit.MILLISECONDS),
-                    new FiniteDuration(2000, TimeUnit.MILLISECONDS),
+                    new FiniteDuration(T, TimeUnit.MILLISECONDS),
                     peer,
                     new UpdateAgesAndGossipMessage(),
                     system.dispatcher(),

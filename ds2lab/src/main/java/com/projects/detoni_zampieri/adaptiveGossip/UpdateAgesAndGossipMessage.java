@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class UpdateAgesAndGossipMessage implements Serializable {
     public UpdateAgesAndGossipMessage() {
-
+        this.newEvent = new Event();
     }
+
+    public Event newEvent;
 }

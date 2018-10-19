@@ -5,10 +5,7 @@ import akka.actor.UntypedActor;
 import com.projects.detoni_zampieri.lab1.message.StartBroadcastMessage;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class GossipActor extends UntypedActor {
@@ -21,6 +18,8 @@ public class GossipActor extends UntypedActor {
 
         this.events = new ArrayList<Event>();
         this.minBuffer = MAX_BUFFER_SIZE - this.events.size();
+        this.k = 10;
+        this.f = 3;
 
     }
 
@@ -36,20 +35,17 @@ public class GossipActor extends UntypedActor {
             // Increment age of events
             for (Event e : events)
             {
-                e.age++;
+                e.incrementAge();
             }
 
             // Remove oldest elements
-            for (Event e : events)
-            {
-                if (e.age > k)
-                {
-                    events.remove(e);
-                }
-            }
+            this.events.removeIf(e -> e.age > k);
+
+            // Add the newly generated event to the list
+            this.events.add(((UpdateAgesAndGossipMessage)o).newEvent);
 
             // Send gossip to everybody
-            gossipMulticast(new Message(Collections.unmodifiableList(this.events)));
+            gossipMulticast(new Message(new ArrayList<>(this.events)));
 
         } else if (o instanceof Message) {
             onReceiveGossip((Message)o);
@@ -66,7 +62,7 @@ public class GossipActor extends UntypedActor {
         int skip = 0;
         for (int i = 0; i < f; i++) {
             // Do not send a message to myself (h@ck3r w@y)
-            if (this.peers.get(i).equals(getSelf())) {
+            if (this.peers.get(i+skip).equals(getSelf())) {
                 skip++;
                 i--;
             } else {
@@ -111,8 +107,7 @@ public class GossipActor extends UntypedActor {
     private int MAX_BUFFER_SIZE = 100; // Max number of messages
     public List<Event> events; // Buffer for messages
     public int minBuffer; // Minimal size of the buffer
-    public int s; //Current period
-    public int T;
+    public int s; // Current period
     public int k; // Maximum age for events
-    public int f; // Total number of random peers
+    public int f; // Total number of random peers (fanout)
 }
