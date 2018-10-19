@@ -105,7 +105,16 @@ public class GossipActor extends UntypedActor {
             Iterator<Event> iter = sorted_events.iterator();
             for(int i=0;i<diff;i++,(Event e =iter.next()))
             {
-                //TODO
+                iter.remove();
+            }
+
+
+
+            Iterator<Event> iter = list.iterator();
+            while(iter.hasNext())
+            {
+                Event e = iter.next();
+
             }
         }
     }
