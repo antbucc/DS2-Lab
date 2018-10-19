@@ -11,7 +11,7 @@ import java.util.List;
 public class ApplicationMain {
 
     public static void main(String[] args) {
-        final ActorSystem system = ActorSystem.create("reliable_broadcast");
+        final ActorSystem system = ActorSystem.create("adaptive-gossip");
         int numActors = 10;
         List<ActorRef> nodes = new ArrayList<ActorRef>();
 
