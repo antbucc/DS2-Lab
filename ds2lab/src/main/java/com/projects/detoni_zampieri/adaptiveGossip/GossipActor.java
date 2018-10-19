@@ -49,31 +49,56 @@ public class GossipActor extends UntypedActor {
             }
 
             // Send gossip to everybody
-            
-        }
-        else
+
+        } else if (o instanceof Message) {
+            onReceiveGossip((Message)o);
+        } else
         {
             unhandled(o);
         }
     }
 
-    private void gossipMulticast(Message m)
-    {
+    private void gossipMulticast(Message m) {
         // Select f random processes
         // and send them the message
         Collections.shuffle(this.peers);
-        int skip=0;
-        for (int i=0; i<f; i++)
-        {
+        int skip = 0;
+        for (int i = 0; i < f; i++) {
             // Do not send a message to myself (h@ck3r w@y)
-            if (this.peers.get(i).equals(getSelf()))
-            {
+            if (this.peers.get(i).equals(getSelf())) {
                 skip++;
                 i--;
             } else {
                 this.peers.get(i + skip).tell(m, ActorRef.noSender());
             }
         }
+    }
+
+    public Event getLocalEvent(Event e)
+    {
+        return this.events.get(this.events.indexOf(e));
+    }
+
+    public void onReceiveGossip(Message gossip)
+    {
+        for(Event e : this.events)
+        {
+            if(!this.events.contains(e))
+            {
+                this.events.add(e);
+                deliver(e);
+            }
+            else {
+                Event e_prime = getLocalEvent(e);
+                if(e_prime.age < e.age)
+                    e_prime.age = e.age;
+            }
+        }
+    }
+
+    public void deliver(Event e)
+    {
+        System.out.println("Received event "+e.id.toString());
     }
 
     // Default variables for the actor
