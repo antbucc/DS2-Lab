@@ -23,6 +23,11 @@ public class GossipActor extends UntypedActor {
         this.f = 3;
         this.s_timeout = 3000;
         this.T = 1300;
+        this.h = 7;
+        this.l = 5;
+        this.avgAge = (this.h +this.l)/2;
+        this.lost = new HashSet<>();
+        this.alpha = 0.8;
 
         this.delta = 2;
         this.s = 2;
@@ -144,8 +149,10 @@ public class GossipActor extends UntypedActor {
             Iterator<Event> iter = sorted_events.iterator();
             for(int i=0;i<diff;i++)
             {
-                iter.next();
+                Event lost_e = iter.next();
                 iter.remove();
+                this.lost.add(lost_e);
+                this.avgAge = this.alpha*this.avgAge + (1-this.alpha)*lost_e.age;
             }
             
         }
@@ -188,4 +195,8 @@ public class GossipActor extends UntypedActor {
     public int f; // Total number of random peers (fanout)
     public int T; //timeout period for UpdateAndGossip procedure
     public int s_timeout; // timeout period for the generation of a new period
+    public int h,l; // high and low parameters to vary the thorughput
+    public double avgAge;  // average age statistic
+    public double alpha; //hyperparameter for the exponential mean for the age of discarded events
+    public Set<Event> lost;
 }
