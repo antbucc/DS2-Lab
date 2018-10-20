@@ -21,14 +21,18 @@ public class GossipActor extends UntypedActor {
         this.minBuffer = MAX_BUFFER_SIZE - this.events.size();
         this.k = 10;
         this.f = 3;
-        this.s_timeout = 3000;
-        this.T = 1300;
+        this.T = 1500;
+        this.s_timeout = this.T*2;
         this.h = 7;
         this.l = 5;
         this.avgAge = (this.h +this.l)/2;
         this.lost = new HashSet<>();
         this.alpha = 0.8;
-
+        this.token_count = this.max_token_count = 20;
+        this.token_rate = 1 / 250;  // 1 token every 250 ms 
+        this.rh =0.05; // 5% increment
+        this.rl=0.05; // 5% decrement
+        
         this.delta = 2;
         this.s = 2;
         this.minBuffers = new ArrayList<Integer>();
@@ -50,26 +54,8 @@ public class GossipActor extends UntypedActor {
             scheduleTimeout(new UpdateAgesAndGossipMessage(),this.T);
         } else if (o instanceof UpdateAgesAndGossipMessage)
         {
-            // Increment age of events
-            for (Event e : events)
-            {
-                e.incrementAge();
-            }
-
-            // Remove oldest elements
-            this.events.removeIf(e -> e.age > k);
-
-            // Add the newly generated event to the list
-            this.events.add(((UpdateAgesAndGossipMessage)o).newEvent);
-
-            // Send gossip to everybody
-            gossipMulticast(new Message(new ArrayList<>(this.events),
-                    this.s,
-                    this.minBuffer));
-            
-            scheduleTimeout(new UpdateAgesAndGossipMessage(),this.T); // reschedule the periodic task
-
-        }else if (o instanceof EnterNewPeriodMessage){
+            onUpdateAgeAndGossipMessage((UpdateAgesAndGossipMessage)o);
+        } else if (o instanceof EnterNewPeriodMessage){
 
             this.s++;
             this.minBuffers.add(s-1, this.MAX_BUFFER_SIZE-this.events.size());
@@ -87,9 +73,40 @@ public class GossipActor extends UntypedActor {
 
         } else if (o instanceof Message) {
             onReceiveGossip((Message)o);
-        } else
-        {
+        } else if(o instanceof IncrementToken){
+        	if(this.token_count < this.max_token_count) {
+        		this.token_count++;
+        	}
+        } else {
             unhandled(o);
+        }
+    }
+    
+    public void onUpdateAgeAndGossipMessage(UpdateAgesAndGossipMessage o) {
+    	// Increment age of events
+        for (Event e : events)
+        {
+            e.incrementAge();
+        }
+
+        // Remove oldest elements
+        this.events.removeIf(e -> e.age > k);
+
+        // Add the newly generated event to the list
+        this.events.add(o.newEvent);
+
+        // Send gossip to everybody
+        gossipMulticast(new Message(new ArrayList<>(this.events),
+                this.s,
+                this.minBuffer));
+        
+        scheduleTimeout(new UpdateAgesAndGossipMessage(),this.T); // reschedule the periodic task
+        
+        //throttle sender
+        if(this.avgAge>this.h) {
+        	this.token_rate *= 1+this.rh;
+        } else if(this.avgAge < this.l) {
+        	this.token_rate *= 1-this.rl;
         }
     }
     
@@ -199,4 +216,8 @@ public class GossipActor extends UntypedActor {
     public double avgAge;  // average age statistic
     public double alpha; //hyperparameter for the exponential mean for the age of discarded events
     public Set<Event> lost;
+    public int token_count;
+    public int max_token_count;
+    public double token_rate; //rate at which restore some token to be sent (token per millisecond)
+    public double rh,rl; //modifiers in percentage that regulate the 'token_rate' variable
 }
