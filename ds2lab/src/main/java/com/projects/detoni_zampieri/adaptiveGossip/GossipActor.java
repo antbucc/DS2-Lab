@@ -2,8 +2,12 @@ package com.projects.detoni_zampieri.adaptiveGossip;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import com.projects.detoni_zampieri.lab1.message.StartBroadcastMessage;
 
 public class GossipActor extends UntypedActor {
 
@@ -17,6 +21,8 @@ public class GossipActor extends UntypedActor {
         this.minBuffer = MAX_BUFFER_SIZE - this.events.size();
         this.k = 10;
         this.f = 3;
+        this.s_timeout = 3000;
+        this.T = 1300;
 
         this.delta = 2;
         this.s = 2;
@@ -35,6 +41,8 @@ public class GossipActor extends UntypedActor {
         if (o instanceof ListMessage)
         {
             this.peers = ((ListMessage) o).m_nodes;
+            scheduleTimeout(new EnterNewPeriodMessage(),this.s_timeout); //initialise timeouts for periodic actions
+            scheduleTimeout(new UpdateAgesAndGossipMessage(),this.T);
         } else if (o instanceof UpdateAgesAndGossipMessage)
         {
             // Increment age of events
@@ -53,6 +61,8 @@ public class GossipActor extends UntypedActor {
             gossipMulticast(new Message(new ArrayList<>(this.events),
                     this.s,
                     this.minBuffer));
+            
+            scheduleTimeout(new UpdateAgesAndGossipMessage(),this.T); // reschedule the periodic task
 
         }else if (o instanceof EnterNewPeriodMessage){
 
@@ -67,7 +77,8 @@ public class GossipActor extends UntypedActor {
                     this.minBuffer = this.minBuffers.get(i);
                 }
             }
-
+            
+            scheduleTimeout(new EnterNewPeriodMessage(),this.s_timeout);
 
         } else if (o instanceof Message) {
             onReceiveGossip((Message)o);
@@ -75,6 +86,16 @@ public class GossipActor extends UntypedActor {
         {
             unhandled(o);
         }
+    }
+    
+    public void scheduleTimeout(Object timeoutMessage,int milliseconds) {
+    	getContext().system().scheduler().scheduleOnce(
+                new FiniteDuration(milliseconds, TimeUnit.MILLISECONDS),
+                getSelf(),
+                timeoutMessage,
+                getContext().system().dispatcher(),
+                getSelf()
+        );
     }
 
     private void gossipMulticast(Message m) {
@@ -165,4 +186,6 @@ public class GossipActor extends UntypedActor {
     public int delta; // Interval for computing minBuffer
     public int k; // Maximum age for events
     public int f; // Total number of random peers (fanout)
+    public int T; //timeout period for UpdateAndGossip procedure
+    public int s_timeout; // timeout period for the generation of a new period
 }
