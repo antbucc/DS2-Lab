@@ -25,11 +25,11 @@ public class GossipActor extends UntypedActor {
         this.s_timeout = this.T*2;
         this.h = 7;
         this.l = 5;
-        this.avgAge = (this.h +this.l)/2;
+        this.avgAge = (this.h +this.l)/2.0;
         this.lost = new HashSet<>();
         this.alpha = 0.8;
         this.token_count = this.max_token_count = 20;
-        this.token_rate = 1 / 250;  // 1 token every 250 ms 
+        this.token_rate = 1.0 / 250.0;  // 1 token every 250 ms
         this.rh =0.05; // 5% increment
         this.rl=0.05; // 5% decrement
         this.W=0.5;
@@ -144,6 +144,10 @@ public class GossipActor extends UntypedActor {
 
     public void onReceiveGossip(Message gossip)
     {
+        // Wait to have enough tokens
+        while(this.token_count <=0){}
+        this.token_count--;
+
         //update my events
         for(Event e:gossip.events)
         {
