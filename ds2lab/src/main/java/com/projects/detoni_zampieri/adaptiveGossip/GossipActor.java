@@ -32,6 +32,7 @@ public class GossipActor extends UntypedActor {
         this.token_rate = 1 / 250;  // 1 token every 250 ms 
         this.rh =0.05; // 5% increment
         this.rl=0.05; // 5% decrement
+        this.W=0.5;
         
         this.delta = 2;
         this.s = 2;
@@ -83,7 +84,7 @@ public class GossipActor extends UntypedActor {
     }
     
     public void onUpdateAgeAndGossipMessage(UpdateAgesAndGossipMessage o) {
-    	// Increment age of events
+        // Increment age of events
         for (Event e : events)
         {
             e.incrementAge();
@@ -103,7 +104,7 @@ public class GossipActor extends UntypedActor {
         scheduleTimeout(new UpdateAgesAndGossipMessage(),this.T); // reschedule the periodic task
         
         //throttle sender
-        if(this.avgAge>this.h) {
+        if(this.avgAge>this.h && this.rng.nextDouble()>this.W) {
         	this.token_rate *= 1+this.rh;
         } else if(this.avgAge < this.l) {
         	this.token_rate *= 1-this.rl;
@@ -220,4 +221,5 @@ public class GossipActor extends UntypedActor {
     public int max_token_count;
     public double token_rate; //rate at which restore some token to be sent (token per millisecond)
     public double rh,rl; //modifiers in percentage that regulate the 'token_rate' variable
+    public double W;
 }

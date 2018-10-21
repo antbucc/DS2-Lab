@@ -33,7 +33,7 @@ public class ApplicationMain {
         }
 
         // Schedule update of ages and gossiping
-        for (ActorRef peer : nodes)
+        /*for (ActorRef peer : nodes)
         {
             system.scheduler().schedule(new FiniteDuration(0, TimeUnit.MILLISECONDS),
                     new FiniteDuration(T, TimeUnit.MILLISECONDS),
@@ -52,7 +52,7 @@ public class ApplicationMain {
                     new EnterNewPeriodMessage(),
                     system.dispatcher(),
                     null);
-        }
+        }*/
 
         // Smartly manage the lifetime of the application.
         // Wait until we have no more messages and then press ENTER
