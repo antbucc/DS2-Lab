@@ -16,7 +16,19 @@ import java.util.Random;
 
 public abstract class EpidemicActor extends AbstractActor {
 
+    // Actor variables
     private static final double UPDATE_PROBABILITY = 0.05;
+    // Adaptive variables
+    int T = 1;          // Gossip period, every this ms sends all buffered events
+    int bufferSize = 1; // Actual size of the buffer
+    int S = 2 * T;      //
+    int delta2 = 2;     //
+    int H = 7;          //
+    int L = 5;           //
+    double alpha = 0.8; //
+    double rH = 0.05;   //
+    double rL = 0.05;    //
+    double W = 0.5;     //
     private final long delta = 100;
     protected final ActorRef me = getSelf();
     private int round = 0;
