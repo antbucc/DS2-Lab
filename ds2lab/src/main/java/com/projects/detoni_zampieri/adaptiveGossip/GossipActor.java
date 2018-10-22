@@ -1,5 +1,6 @@
 package com.projects.detoni_zampieri.adaptiveGossip;
 
+import akka.actor.Actor;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import scala.concurrent.duration.FiniteDuration;
@@ -28,11 +29,11 @@ public class GossipActor extends UntypedActor {
         this.avgAge = (this.h +this.l)/2.0;
         this.lost = new HashSet<>();
         this.alpha = 0.8;
-        this.token_count = this.max_token_count = 20;
-        this.token_rate = 1.0 / 250.0;  // 1 token every 250 ms
+        this.token_count = this.max_token_count = 10;
+        this.token_rate = 1/300.0;  // 1 token every 1500 ms
         this.rh =0.05; // 5% increment
         this.rl=0.05; // 5% decrement
-        this.W=0.5;
+        this.W=0.0;
         
         this.delta = 2;
         this.s = 2;
@@ -41,6 +42,7 @@ public class GossipActor extends UntypedActor {
         {
             this.minBuffers.add(i, MAX_BUFFER_SIZE - this.events.size());
         }
+        this.delayed_events = new ArrayList<Event>();
 
     }
 
@@ -53,6 +55,7 @@ public class GossipActor extends UntypedActor {
             this.peers = ((ListMessage) o).m_nodes;
             scheduleTimeout(new EnterNewPeriodMessage(),this.s_timeout); //initialise timeouts for periodic actions
             scheduleTimeout(new UpdateAgesAndGossipMessage(),this.T);
+            scheduleTimeout(new IncrementToken(), (int)(1/this.token_rate));
         } else if (o instanceof UpdateAgesAndGossipMessage)
         {
             onUpdateAgeAndGossipMessage((UpdateAgesAndGossipMessage)o);
@@ -78,6 +81,7 @@ public class GossipActor extends UntypedActor {
         	if(this.token_count < this.max_token_count) {
         		this.token_count++;
         	}
+            scheduleTimeout(new IncrementToken(), (int)(1/this.token_rate));
         } else {
             unhandled(o);
         }
@@ -93,21 +97,33 @@ public class GossipActor extends UntypedActor {
         // Remove oldest elements
         this.events.removeIf(e -> e.age > k);
 
-        // Add the newly generated event to the list
-        this.events.add(o.newEvent);
+        // Wait to have enough tokens
+        //System.out.println("Agent "+this.nodeId+": "+this.token_count);
+        if (this.token_count > 0) {
+            this.token_count--;
 
-        // Send gossip to everybody
-        gossipMulticast(new Message(new ArrayList<>(this.events),
-                this.s,
-                this.minBuffer));
-        
+            // Add the newly generated event to the list
+            this.delayed_events.add(o.newEvent);
+            this.events.addAll(this.delayed_events);
+            this.delayed_events.clear();
+
+            // Send gossip to everybody
+            gossipMulticast(new Message(new ArrayList<>(this.events),
+                    this.s,
+                    this.minBuffer));
+        } else {
+            this.delayed_events.add(o.newEvent);
+        }
+
         scheduleTimeout(new UpdateAgesAndGossipMessage(),this.T); // reschedule the periodic task
-        
+
         //throttle sender
         if(this.avgAge>this.h && this.rng.nextDouble()>this.W) {
         	this.token_rate *= 1+this.rh;
+            System.out.println("Speed up "+1/this.token_rate);
         } else if(this.avgAge < this.l) {
         	this.token_rate *= 1-this.rl;
+            System.out.println("Slow down "+1/this.token_rate);
         }
     }
     
@@ -126,15 +142,17 @@ public class GossipActor extends UntypedActor {
         // and send them the message
         Collections.shuffle(this.peers);
         int skip = 0;
+
+        Iterator<ActorRef> tmp_iter= this.peers.iterator();
         for (int i = 0; i < f; i++) {
-            // Do not send a message to myself (h@ck3r w@y)
-            if (this.peers.get(i+skip).equals(getSelf())) {
-                skip++;
-                i--;
-            } else {
-                this.peers.get(i + skip).tell(m, ActorRef.noSender());
-            }
+           ActorRef p = tmp_iter.next();
+           if (p.equals(getSelf()))
+           {
+               p= tmp_iter.next();
+           }
+           p.tell(m, ActorRef.noSender());
         }
+        //System.out.println("Agent "+this.nodeId+": Sent broadcast message.");
     }
 
     public Event getLocalEvent(Event e)
@@ -144,10 +162,6 @@ public class GossipActor extends UntypedActor {
 
     public void onReceiveGossip(Message gossip)
     {
-        // Wait to have enough tokens
-        while(this.token_count <=0){}
-        this.token_count--;
-
         //update my events
         for(Event e:gossip.events)
         {
@@ -185,11 +199,15 @@ public class GossipActor extends UntypedActor {
             this.minBuffers.set(s-1, gossip.minBuffer);
         }
 
+        // Synchronize
+        if (gossip.age > this.s)
+            this.s=gossip.age;
+
     }
 
     public void deliver(Event e)
     {
-        System.out.println("Received event "+e.id.toString());
+        //System.out.println("Received event "+e.id.toString());
     }
 
     @Override
@@ -207,7 +225,7 @@ public class GossipActor extends UntypedActor {
     public List<ActorRef> peers;
 
     // Adaptive Gossip Variables
-    private int MAX_BUFFER_SIZE = 100; // Max number of messages
+    private int MAX_BUFFER_SIZE = 10; // Max number of messages
     public List<Event> events; // Buffer for messages
     public int minBuffer; // Minimal size of the buffer
     public List<Integer> minBuffers;
@@ -226,4 +244,5 @@ public class GossipActor extends UntypedActor {
     public double token_rate; //rate at which restore some token to be sent (token per millisecond)
     public double rh,rl; //modifiers in percentage that regulate the 'token_rate' variable
     public double W;
+    public List<Event> delayed_events;
 }
