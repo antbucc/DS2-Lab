@@ -20,7 +20,6 @@ public class GossipActor extends UntypedActor {
         this.nodeId = rng.nextInt();
 
         this.events = new ArrayList<Event>();
-        this.minBuffer = MAX_BUFFER_SIZE - this.events.size();
         this.k = 10;
         this.f = 3;
         this.T = 1500;
@@ -71,7 +70,14 @@ public class GossipActor extends UntypedActor {
         } else if (o instanceof EnterNewPeriodMessage){
 
             this.s++;
-            this.minBuffers.add(s-1, this.MAX_BUFFER_SIZE-this.events.size());
+
+            // Prevents to assign negative values
+            int new_buff = this.MAX_BUFFER_SIZE - this.events.size();
+            if (new_buff < 0) {
+                new_buff=0;
+            }
+
+            this.minBuffers.add(s-1, new_buff);
             this.minBuffer = this.minBuffers.get(s-1);
 
             for(int i=s-1; i>s-1-delta-1; i--)
@@ -85,6 +91,7 @@ public class GossipActor extends UntypedActor {
             scheduleTimeout(new EnterNewPeriodMessage(),this.s_timeout);
 
         } else if (o instanceof Message) {
+
             onReceiveGossip((Message)o);
         } else if(o instanceof IncrementToken){
         	if(this.token_count < this.max_token_count) {
@@ -164,7 +171,7 @@ public class GossipActor extends UntypedActor {
                p= tmp_iter.next();
            }
            try {
-               p.tell(m.clone(), ActorRef.noSender());
+               p.tell((Message)m.clone(), ActorRef.noSender());
            } catch (Exception e) {
            }
         }
@@ -192,6 +199,7 @@ public class GossipActor extends UntypedActor {
                     e_prime.age = e.age;
             }
         }
+
         if(this.events.size() > this.MAX_BUFFER_SIZE)
         {
             // Remove the previous events
