@@ -30,7 +30,7 @@ public class GossipActor extends UntypedActor {
         this.lost = new HashSet<>();
         this.alpha = 0.8;
         this.token_count = this.max_token_count = 10;
-        this.token_rate = 1/300.0;  // 1 token every 1500 ms
+        this.token_rate = 1/1500.0;  // 1 token every 1500 ms
         this.rh =0.05; // 5% increment
         this.rl=0.05; // 5% decrement
         this.W=0.5;
@@ -91,7 +91,6 @@ public class GossipActor extends UntypedActor {
             scheduleTimeout(new EnterNewPeriodMessage(),this.s_timeout);
 
         } else if (o instanceof Message) {
-
             onReceiveGossip((Message)o);
         } else if(o instanceof IncrementToken){
         	if(this.token_count < this.max_token_count) {
@@ -171,8 +170,9 @@ public class GossipActor extends UntypedActor {
                p= tmp_iter.next();
            }
            try {
-               p.tell((Message)m.clone(), ActorRef.noSender());
+               p.tell((Message)(m.clone()), ActorRef.noSender());
            } catch (Exception e) {
+               e.printStackTrace();
            }
         }
         //System.out.println("Agent "+this.nodeId+": Sent broadcast message.");

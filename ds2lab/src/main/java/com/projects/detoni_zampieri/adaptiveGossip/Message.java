@@ -14,7 +14,8 @@ public class Message implements Serializable {
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        Message tmp = new Message(null, 0, 0);
+
+        Message tmp = new Message(new ArrayList<>(), 0, 0);
         tmp.age = this.age;
         tmp.minBuffer = this.minBuffer;
 
