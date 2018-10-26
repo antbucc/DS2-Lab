@@ -5,6 +5,10 @@ import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +48,13 @@ public class GossipActor extends UntypedActor {
         }
         this.delayed_events = new ArrayList<Event>();
 
+        // Logger: timestamp, variable, value
+        try {
+            this.logger = new PrintWriter(new File("./"+this.nodeId+"-log.csv"));
+        } catch (FileNotFoundException e)
+        {
+            System.out.println(e);
+        }
     }
 
     @Override
@@ -219,6 +230,22 @@ public class GossipActor extends UntypedActor {
                 +(this.MAX_BUFFER_SIZE-this.minBuffers.size())+")");
     }
 
+    public void log(Timestamp tmstp, String variable, String value)
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append(tmstp.toString()+",");
+        builder.append(variable+",");
+        builder.append(value);
+        this.logger.write(builder.toString());
+        this.logger.flush();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        this.logger.close();
+    }
+
     // Default variables for the actor
     public Random rng;
     public int nodeId;
@@ -245,4 +272,6 @@ public class GossipActor extends UntypedActor {
     public double rh,rl; //modifiers in percentage that regulate the 'token_rate' variable
     public double W;
     public List<Event> delayed_events;
+
+    public PrintWriter logger;
 }
