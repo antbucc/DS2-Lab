@@ -1,6 +1,5 @@
 package com.projects.detoni_zampieri.adaptiveGossip;
 
-import akka.actor.Actor;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import scala.concurrent.duration.FiniteDuration;
@@ -8,11 +7,9 @@ import scala.concurrent.duration.FiniteDuration;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import com.projects.detoni_zampieri.lab1.message.StartBroadcastMessage;
 
 public class GossipActor extends UntypedActor {
 
@@ -37,7 +34,7 @@ public class GossipActor extends UntypedActor {
         this.token_rate = 1/300.0;  // 1 token every 1500 ms
         this.rh =0.05; // 5% increment
         this.rl=0.05; // 5% decrement
-        this.W=0.0;
+        this.W=0.5;
         
         this.delta = 2;
         this.s = 2;
@@ -211,6 +208,9 @@ public class GossipActor extends UntypedActor {
                 Event lost_e = iter.next();
                 this.lost.add(lost_e);
                 this.avgAge = this.alpha*this.avgAge + (1-this.alpha)*lost_e.age;
+                this.log(System.currentTimeMillis(),
+                        "avg_age",
+                        this.avgAge);
             }
 
             // Remove the oldest elements
