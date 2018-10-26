@@ -46,6 +46,7 @@ public class GossipActor extends UntypedActor {
         {
             this.minBuffers.add(i, MAX_BUFFER_SIZE - this.events.size());
         }
+        this.minBuffer = this.minBuffers.get(s-1);
         this.delayed_events = new ArrayList<Event>();
 
         // Logger: timestamp, variable, value
@@ -165,7 +166,10 @@ public class GossipActor extends UntypedActor {
            {
                p= tmp_iter.next();
            }
-           p.tell(m, ActorRef.noSender());
+           try {
+               p.tell(m.clone(), ActorRef.noSender());
+           } catch (Exception e) {
+           }
         }
         //System.out.println("Agent "+this.nodeId+": Sent broadcast message.");
     }
@@ -193,17 +197,28 @@ public class GossipActor extends UntypedActor {
         }
         if(this.events.size() > this.MAX_BUFFER_SIZE)
         {
+            // Remove the previous events
+            this.lost.clear();
+
             //remove the excess
             ArrayList<Event> sorted_events = new ArrayList<>(this.events);
             Collections.sort(sorted_events,(e1,e2)-> e2.age - e1.age);
-            int diff = this.events.size() - MAX_BUFFER_SIZE;
             Iterator<Event> iter = sorted_events.iterator();
-            for(int i=0;i<diff;i++)
+
+            // Update the average age
+            while(this.events.size()-this.lost.size() > this.minBuffer)
             {
                 Event lost_e = iter.next();
-                iter.remove();
                 this.lost.add(lost_e);
                 this.avgAge = this.alpha*this.avgAge + (1-this.alpha)*lost_e.age;
+            }
+
+            // Remove the oldest elements
+            Iterator<Event> iter_remove = sorted_events.iterator();
+            while(this.events.size() > this.MAX_BUFFER_SIZE)
+            {
+                Event e = iter_remove.next();
+                this.events.remove(e);
             }
             
         }

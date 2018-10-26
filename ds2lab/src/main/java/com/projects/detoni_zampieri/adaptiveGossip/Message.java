@@ -12,6 +12,21 @@ public class Message implements Serializable {
         this.events = new ArrayList<>(events);
     }
 
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Message tmp = new Message(null, 0, 0);
+        tmp.age = this.age;
+        tmp.minBuffer = this.minBuffer;
+
+        tmp.events = new ArrayList<Event>();
+        for (Event e : this.events)
+        {
+            tmp.events.add((Event)e.clone());
+        }
+
+        return tmp;
+    }
+
     public int age;
     public List<Event> events;
     public int minBuffer;

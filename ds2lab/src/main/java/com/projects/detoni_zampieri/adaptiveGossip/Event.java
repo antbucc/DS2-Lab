@@ -25,4 +25,12 @@ public class Event{
 		}
 		return false;
 	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		Event tmp = new Event();
+		tmp.age = this.age;
+		tmp.id = this.id;
+		return tmp;
+	}
 }
