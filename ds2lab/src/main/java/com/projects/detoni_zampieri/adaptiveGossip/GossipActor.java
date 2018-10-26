@@ -131,10 +131,14 @@ public class GossipActor extends UntypedActor {
         //throttle sender
         if(this.avgAge>this.h && this.rng.nextDouble()>this.W) {
         	this.token_rate *= 1+this.rh;
-            System.out.println("Speed up "+1/this.token_rate);
+            this.log(System.currentTimeMillis(),
+                    "token_rate",
+                    1/this.token_rate);
         } else if(this.avgAge < this.l) {
         	this.token_rate *= 1-this.rl;
-            System.out.println("Slow down "+1/this.token_rate);
+            this.log(System.currentTimeMillis(),
+                    "token_rate",
+                    1/this.token_rate);
         }
     }
     
@@ -230,12 +234,14 @@ public class GossipActor extends UntypedActor {
                 +(this.MAX_BUFFER_SIZE-this.minBuffers.size())+")");
     }
 
-    public void log(Timestamp tmstp, String variable, String value)
+    public void log(long tmstp, String variable, Object value)
     {
+
         StringBuilder builder = new StringBuilder();
-        builder.append(tmstp.toString()+",");
+        builder.append(tmstp+",");
         builder.append(variable+",");
         builder.append(value);
+        builder.append("\n");
         this.logger.write(builder.toString());
         this.logger.flush();
     }
