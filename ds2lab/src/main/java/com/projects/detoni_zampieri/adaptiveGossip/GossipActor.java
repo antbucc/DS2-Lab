@@ -60,7 +60,7 @@ public class GossipActor extends UntypedActor {
         // Catch the list message
         if (o instanceof ListMessage)
         {
-            this.peers = ((ListMessage) o).m_nodes;
+            this.peers = new ArrayList<>(((ListMessage) o).m_nodes);
             scheduleTimeout(new EnterNewPeriodMessage(),this.s_timeout); //initialise timeouts for periodic actions
             scheduleTimeout(new UpdateAgesAndGossipMessage(),this.T);
             scheduleTimeout(new IncrementToken(), (int)(1/this.token_rate));
