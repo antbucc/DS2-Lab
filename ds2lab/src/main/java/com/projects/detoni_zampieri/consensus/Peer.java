@@ -21,6 +21,8 @@ public class Peer extends UntypedActor {
 			onListMessage((ListMessage)msg);
 		} else if(msg instanceof PingMessage){
 			getSender().tell(new PongMessage(), getSelf());
+		} else if(msg instanceof ProposeMessage){
+			onProposeMessage((ProposeMessage)msg);
 		} else {
 			unhandled(msg);
 		}
@@ -31,6 +33,9 @@ public class Peer extends UntypedActor {
 		this.peers = new ArrayList<>(((ListMessage) msg).peers);
 	}
 	
+	public void onProposeMessage(ProposeMessage msg) {
+		// TODO implement
+	}
 
 	public List<ActorRef> peers;
 	public GlobalClock globalClock;
