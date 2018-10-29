@@ -32,28 +32,6 @@ public class ApplicationMain {
             nodes.get(i).tell(new ListMessage(nodes), ActorRef.noSender());
         }
 
-        // Schedule update of ages and gossiping
-        /*for (ActorRef peer : nodes)
-        {
-            system.scheduler().schedule(new FiniteDuration(0, TimeUnit.MILLISECONDS),
-                    new FiniteDuration(T, TimeUnit.MILLISECONDS),
-                    peer,
-                    new UpdateAgesAndGossipMessage(),
-                    system.dispatcher(),
-                    null);
-        }
-
-        // Schedule update of ages and gossiping
-        for (ActorRef peer : nodes)
-        {
-            system.scheduler().schedule(new FiniteDuration(0, TimeUnit.MILLISECONDS),
-                    new FiniteDuration(S, TimeUnit.MILLISECONDS),
-                    peer,
-                    new EnterNewPeriodMessage(),
-                    system.dispatcher(),
-                    null);
-        }*/
-
         // Smartly manage the lifetime of the application.
         // Wait until we have no more messages and then press ENTER
         // to terminate the execution.
