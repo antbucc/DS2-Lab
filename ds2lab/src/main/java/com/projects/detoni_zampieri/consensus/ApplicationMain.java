@@ -20,7 +20,7 @@ public class ApplicationMain {
 
         // Create the set of actors
         for (int i = 0; i < numActors; i++) {
-            ActorRef a = system.actorOf(Props.create(Peer.class)
+            ActorRef a = system.actorOf(Peer.props(i)
                     .withDispatcher("akka.actor.my-pinned-dispatcher"), "node-" + i);
             nodes.add(a);
         }

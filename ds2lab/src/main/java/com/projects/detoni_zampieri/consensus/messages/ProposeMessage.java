@@ -4,4 +4,9 @@ import java.io.Serializable;
 
 public class ProposeMessage implements Serializable {
 
+	public int value;
+	
+	public ProposeMessage(int v) {
+		this.value = v;
+	}
 }
