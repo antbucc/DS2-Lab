@@ -52,7 +52,6 @@ public class EventuallyStrongFD extends UntypedActor{
 	public void setSuspected(ActorRef actor) {
 		suspectedActors.add(actor);
 		owner.tell(new NewSuspectMessage(actor), getSelf());
-		System.out.println("suspected "+actor);
 	}
 	
 	public void broadcastPing() {
