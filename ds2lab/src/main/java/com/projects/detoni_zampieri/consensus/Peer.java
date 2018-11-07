@@ -44,6 +44,7 @@ public class Peer extends UntypedActor {
 				if(this.waitingPhase1Message && this.actorToID.get(m.suspect)==this.c) {
 					this.aux = Peer.questionMark;
 					this.waitingPhase1Message = false;
+					enterPhase2();
 				}
 			} else if(msg instanceof Phase2){
 				onPhase2((Phase2)msg);
@@ -84,6 +85,7 @@ public class Peer extends UntypedActor {
 			if(isSuspected(suspected, c)) {
 				this.aux = Peer.questionMark;
 				this.waitingPhase1Message = false;
+				enterPhase2();
 			}
 		}
 	}
@@ -99,7 +101,6 @@ public class Peer extends UntypedActor {
 	
 	public void onPhase1(Phase1 msg) {
 		//TODO account for mismatching epochs
-		assert(msg.round == this.round);
 		this.aux = msg.est;
 		this.waitingPhase1Message = false;
 		enterPhase2();
@@ -132,6 +133,7 @@ public class Peer extends UntypedActor {
 				if(this.rec.size()==2) {	//received both ? and a value
 					this.est = getNonQuestionMarkValue(this.rec);
 					assert(this.est!=Peer.questionMark);
+					enterPhase1();
 				} else if(chosen != Peer.questionMark) {
 					this.est = chosen;
 					broadcast(new Decide(this.est),true);
@@ -148,7 +150,7 @@ public class Peer extends UntypedActor {
 			broadcast(new Decide(msg.value));
 			this.decided=true;
 			this.decidedValue = msg.value;
-			System.out.println("Node "+this.id+", round "+this.round+", decided "+this.decidedValue);
+			System.out.println("Node "+this.id+", round "+(this.round-1)+", decided "+this.decidedValue);
 		}
 	}
 	

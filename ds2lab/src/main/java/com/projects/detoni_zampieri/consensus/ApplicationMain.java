@@ -41,7 +41,9 @@ public class ApplicationMain {
 		}
 
         nodes.get(0).tell(new Crash(), ActorRef.noSender());
+        nodes.get(1).tell(new Crash(), ActorRef.noSender());
         nodes.get(4).tell(new StartConsensus(), ActorRef.noSender());
+        
 
         try {
             System.out.println(">>> Press ENTER to exit <<<");
