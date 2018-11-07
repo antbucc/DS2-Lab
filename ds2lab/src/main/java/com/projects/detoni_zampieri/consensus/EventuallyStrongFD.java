@@ -1,6 +1,7 @@
 package com.projects.detoni_zampieri.consensus;
 
 import akka.actor.ActorRef;
+import akka.actor.Props;
 import akka.actor.UntypedActor;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import com.projects.detoni_zampieri.consensus.messages.*;
@@ -16,24 +18,25 @@ import com.projects.detoni_zampieri.consensus.messages.*;
 public class EventuallyStrongFD extends UntypedActor{
 
 	
-	public EventuallyStrongFD(List<ActorRef> peers){
+	public EventuallyStrongFD(List<ActorRef> peers,ActorRef owner){
 		this.peers = new ArrayList<>(peers);
 		this.globalClock = GlobalClock.getClock();
 		this.suspectedActors = new HashSet<>();
 		this.maxTickDifference = 5;
 		this.timeoutPing = 300;
+		this.owner = owner;
+		this.lastPingSent= new HashMap<ActorRef, Integer>();
+		scheduleTimeout(new FDTimeoutPingMessage(), this.timeoutPing);
 	}
 	
 	@Override
 	public void onReceive(Object msg) throws Exception {
-		if(msg instanceof ListMessage) {
-			this.peers = new ArrayList<>(((ListMessage)msg).peers);	
-			scheduleTimeout(new FDTimeoutPingMessage(), this.timeoutPing);
-		} else if(msg instanceof PongMessage) {
+		if(msg instanceof PongMessage) {
 			int tick = globalClock.currentTick();
 			ActorRef sender = getSender();
 			if(lastPingSent.get(sender)-tick > this.maxTickDifference) {
 				suspectedActors.add(sender);
+				owner.tell(new NewSuspectMessage(sender), getSelf());
 			}
 		} else if(msg instanceof FDTimeoutPingMessage){
 			broadcastPing();
@@ -66,6 +69,11 @@ public class EventuallyStrongFD extends UntypedActor{
 		return this.suspectedActors;
 	}
 	
+	public static Props props(List<ActorRef> peers,ActorRef owner) {
+		return Props.create(EventuallyStrongFD.class,()->new EventuallyStrongFD(peers, owner));
+	}
+	
+	private ActorRef owner;
 	private int timeoutPing;
 	private int maxTickDifference;
 	private Set<ActorRef> suspectedActors;
