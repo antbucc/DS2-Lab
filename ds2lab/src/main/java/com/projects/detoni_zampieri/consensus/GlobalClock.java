@@ -4,7 +4,7 @@ public class GlobalClock {
 
 	public static GlobalClock instance = null;
 	private long start_time;
-	private long delta;
+	public long delta;
 	
 	
 	private GlobalClock()
