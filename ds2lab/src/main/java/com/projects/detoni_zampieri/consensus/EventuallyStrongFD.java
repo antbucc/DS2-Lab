@@ -23,7 +23,7 @@ public class EventuallyStrongFD extends UntypedActor{
 		this.globalClock = GlobalClock.getClock();
 		this.suspectedActors = new HashSet<>();
 		this.maxTickDifference = 75;
-		this.timeoutPing = 5000;
+		this.timeoutPing = 8000;
 		this.owner = owner;
 		this.lastPingSent= new HashMap<ActorRef, Integer>();
 		this.lastPongReceived = new HashMap<>();
@@ -52,7 +52,6 @@ public class EventuallyStrongFD extends UntypedActor{
 	public void setSuspected(ActorRef actor) {
 		suspectedActors.add(actor);
 		owner.tell(new NewSuspectMessage(actor), getSelf());
-		System.out.println("suspected "+actor);
 	}
 	
 	public void broadcastPing() {
