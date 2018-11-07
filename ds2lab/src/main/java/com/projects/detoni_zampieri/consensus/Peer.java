@@ -22,37 +22,41 @@ public class Peer extends UntypedActor {
 		this.proc = new HashSet<>();
 		this.rec = new HashSet<>();
 		this.suspected = new HashSet<>();
+		this.hasCrashed = false;
 	}
 
 	@Override
 	public void onReceive(Object msg) throws Exception {
-		if(msg instanceof ListMessage) {
-			ListMessage m = (ListMessage)msg;
-			onListMessage(m);
-			this.fd = getContext().system().actorOf(EventuallyStrongFD.props(new ArrayList<>(m.peers), getSelf()),"fd-"+this.id);
-		} else if(msg instanceof PingMessage){
-			getSender().tell(new PongMessage(), getSelf());
-		} else if(msg instanceof ProposeMessage){
-			onProposeMessage((ProposeMessage)msg);
-		} else if(msg instanceof Phase1){
-			onPhase1((Phase1)msg);
-		} else if(msg instanceof NewSuspectMessage){
-			NewSuspectMessage m=(NewSuspectMessage)msg;
-			this.suspected.add(m.suspect);
-			if(this.waitingPhase1Message && this.actorToID.get(m.suspect)==this.c) {
-				this.aux = Peer.questionMark;
-				this.waitingPhase1Message = false;
+		if(!this.hasCrashed) {
+			if(msg instanceof ListMessage) {
+				ListMessage m = (ListMessage)msg;
+				onListMessage(m);
+				this.fd = getContext().system().actorOf(EventuallyStrongFD.props(new ArrayList<>(m.peers), getSelf()),"fd-"+this.id);
+			} else if(msg instanceof PingMessage){
+				getSender().tell(new PongMessage(), getSelf());
+			} else if(msg instanceof ProposeMessage){
+				onProposeMessage((ProposeMessage)msg);
+			} else if(msg instanceof Phase1){
+				onPhase1((Phase1)msg);
+			} else if(msg instanceof NewSuspectMessage){
+				NewSuspectMessage m=(NewSuspectMessage)msg;
+				this.suspected.add(m.suspect);
+				if(this.waitingPhase1Message && this.actorToID.get(m.suspect)==this.c) {
+					this.aux = Peer.questionMark;
+					this.waitingPhase1Message = false;
+				}
+			} else if(msg instanceof Phase2){
+				onPhase2((Phase2)msg);
+			} else if(msg instanceof Decide){
+				onDecide((Decide)msg);
+			} else if(msg instanceof StartConsensus){
+				broadcast(new ProposeMessage(this.id),true);
+			} else if(msg instanceof Crash){
+				this.hasCrashed = true;
+			} else {
+				unhandled(msg);
 			}
-		} else if(msg instanceof Phase2){
-			onPhase2((Phase2)msg);
-		} else if(msg instanceof Decide){
-			onDecide((Decide)msg);
-		} else if(msg instanceof StartConsensus){
-			broadcast(new ProposeMessage(this.id),true);
-		} else {
-			unhandled(msg);
 		}
-
 	}
 	
 	public void onListMessage(ListMessage msg) {
@@ -95,13 +99,14 @@ public class Peer extends UntypedActor {
 	
 	public void onPhase1(Phase1 msg) {
 		//TODO account for mismatching epochs
+		assert(msg.round == this.round);
 		this.aux = msg.est;
 		this.waitingPhase1Message = false;
 		enterPhase2();
 	}
 	
 	public void enterPhase2() {
-		broadcast(new Phase2(this.round,this.aux));
+		broadcast(new Phase2(this.round,this.aux),true);
 		this.proc.clear();
 		this.rec.clear();
 		this.waitingPhase2Message =true;
@@ -183,4 +188,5 @@ public class Peer extends UntypedActor {
 	public boolean waitingPhase2Message;
 	public int decidedValue;
 	public Set<ActorRef> suspected;
+	public boolean hasCrashed;
 }
