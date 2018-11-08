@@ -149,6 +149,7 @@ public class Peer extends UntypedActor {
 		if(!this.decided) {
 			broadcast(new Decide(msg.value));
 			this.decided=true;
+			this.stop = true;
 			this.decidedValue = msg.value;
 			System.out.println("Node "+this.id+", round "+(this.round-1)+", decided "+this.decidedValue);
 		}
