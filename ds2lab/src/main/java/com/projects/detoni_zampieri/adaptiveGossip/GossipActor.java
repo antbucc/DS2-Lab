@@ -17,7 +17,7 @@ public class GossipActor extends UntypedActor {
 
         // Initialize default variables
         this.rng = new Random();
-        this.nodeId = rng.nextInt();
+        this.nodeId = rng.nextInt(Integer.MAX_VALUE);
 
         this.events = new ArrayList<Event>();
         this.k = 10;
@@ -31,8 +31,8 @@ public class GossipActor extends UntypedActor {
         this.alpha = 0.8;
         this.token_count = this.max_token_count = 10;
         this.token_rate = 1/1500.0;  // 1 token every 1500 ms
-        this.rh =0.05; // 5% increment
-        this.rl=0.05; // 5% decrement
+        this.rh =0.5; // 5% increment
+        this.rl=0.5; // 5% decrement
         this.W=0.5;
         
         this.delta = 2;
@@ -52,6 +52,8 @@ public class GossipActor extends UntypedActor {
         {
             System.out.println(e);
         }
+
+        this.globalClock = GlobalClock.getClock();
     }
 
     @Override
@@ -135,12 +137,12 @@ public class GossipActor extends UntypedActor {
         //throttle sender
         if(this.avgAge>this.h && this.rng.nextDouble()>this.W) {
         	this.token_rate *= 1+this.rh;
-            this.log(System.currentTimeMillis(),
+            this.log(
                     "token_rate",
                     1/this.token_rate);
         } else if(this.avgAge < this.l) {
         	this.token_rate *= 1-this.rl;
-            this.log(System.currentTimeMillis(),
+            this.log(
                     "token_rate",
                     1/this.token_rate);
         }
@@ -200,8 +202,6 @@ public class GossipActor extends UntypedActor {
             }
         }
 
-        if(this.events.size() > this.MAX_BUFFER_SIZE)
-        {
             // Remove the previous events
             this.lost.clear();
 
@@ -216,8 +216,7 @@ public class GossipActor extends UntypedActor {
                 Event lost_e = iter.next();
                 this.lost.add(lost_e);
                 this.avgAge = this.alpha*this.avgAge + (1-this.alpha)*lost_e.age;
-                this.log(System.currentTimeMillis(),
-                        "avg_age",
+                this.log("avg_age",
                         this.avgAge);
             }
 
@@ -228,8 +227,6 @@ public class GossipActor extends UntypedActor {
                 Event e = iter_remove.next();
                 this.events.remove(e);
             }
-            
-        }
 
         // Update congestion rates
         if (gossip.age == this.s && gossip.minBuffer < this.minBuffers.get(s-1))
@@ -257,11 +254,11 @@ public class GossipActor extends UntypedActor {
                 +(this.MAX_BUFFER_SIZE-this.minBuffers.size())+")");
     }
 
-    public void log(long tmstp, String variable, Object value)
+    public void log(String variable, Object value)
     {
 
         StringBuilder builder = new StringBuilder();
-        builder.append(tmstp+",");
+        builder.append(this.globalClock.getAndIncrement()+",");
         builder.append(variable+",");
         builder.append(value);
         builder.append("\n");
@@ -281,7 +278,7 @@ public class GossipActor extends UntypedActor {
     public List<ActorRef> peers;
 
     // Adaptive Gossip Variables
-    private int MAX_BUFFER_SIZE = 10; // Max number of messages
+    private int MAX_BUFFER_SIZE = 100; // Max number of messages
     public List<Event> events; // Buffer for messages
     public int minBuffer; // Minimal size of the buffer
     public List<Integer> minBuffers;
@@ -303,4 +300,5 @@ public class GossipActor extends UntypedActor {
     public List<Event> delayed_events;
 
     public PrintWriter logger;
+    public GlobalClock globalClock;
 }
